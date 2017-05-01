@@ -1,0 +1,1 @@
+-- stored procedures not accessible to the app user

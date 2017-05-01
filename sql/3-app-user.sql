@@ -1,0 +1,1 @@
+-- generate the app user and assign privileges
