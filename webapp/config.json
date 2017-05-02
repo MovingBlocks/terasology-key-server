@@ -1,0 +1,12 @@
+{
+  "listenPort": 8000,
+  "db": {
+    "user": "terasologykeys_app",
+    "database": "terasologykeys",
+    "password": "11804923f96c2e4e5f336cb623ae15f63481f4acdb295727ecdc4adacf9b365a",
+    "host": "localhost",
+    "port": 5432,
+    "max": 10,
+    "idleTimeoutMillis": 1000
+  }
+}

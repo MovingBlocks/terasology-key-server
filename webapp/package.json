@@ -1,0 +1,24 @@
+{
+  "name": "terasology-key-server",
+  "version": "0.1.0",
+  "description": "Web service to store Terasology client identities",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gianluca-nitti/terasology-key-server.git"
+  },
+  "author": "Gianluca Nitti",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gianluca-nitti/terasology-key-server/issues"
+  },
+  "homepage": "https://github.com/gianluca-nitti/terasology-key-server#readme",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2",
+    "express-postgres-sp": "^0.1.0"
+  }
+}

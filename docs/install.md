@@ -19,3 +19,12 @@ user@server:~/terasology-key-server/sql$ vi 3-app-user.sql
 user@server:~/terasology-key-server/sql$ cat *.sql | psql -U terasologykeys_admin -d terasologykeys
 ```
 You will probably be asked to enter the password you set for the `terasologykeys_admin` role. You don't need to create the limited user since the last sql file automatically generates it and assigns the correct privileges.
+
+# Web application
+* If you changed the password for the limited user, edit `webapp/config.json` accordingly.
+* Then, just install the dependencies and run index.js:
+```
+user@server:~$ cd terasology-key-server/webapp
+user@server:~/terasology-key-server/webapp$ npm install
+user@server:~/terasology-key-server/webapp$ node index.js
+```

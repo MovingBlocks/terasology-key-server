@@ -2,8 +2,8 @@
 
 The checkbox indicates whether an action has been implemented (checked) or is planned (unchecked).
 
-## /api/user
-- [ ] POST: register a new user.
+## /api/user_account
+- [x] POST: register a new user.
 
 ## /api/session
 - [ ] POST: given username and password, creates a new session (login with a new client); returns a session token.
