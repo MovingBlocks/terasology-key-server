@@ -6,6 +6,13 @@ user@server:~$ su - postgres
 postgres@server:~$ createuser -dPr terasologykeys_admin -U postgres
 ```
 * Enter a (strong) password when prompted. You will need this password to install the database.
+* While you are connected as superuser, enable the `uuid-ossp` extension (necassary to generate session tokens) on this database (it may require to install additional system packages, such as `postgresql-contrib` on Debian):
+```
+postgres@server:~$ psql -d terasologykeys
+terasologykeys=# CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION
+terasologykeys=# \q
+```
 * Then, create a database with this user as owner:
 ```
 postgres@server:~$ psql -U postgres -c "CREATE DATABASE terasologykeys WITH OWNER terasologykeys_admin;"

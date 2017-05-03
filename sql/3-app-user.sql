@@ -17,4 +17,7 @@ GRANT CONNECT ON DATABASE terasologykeys TO terasologykeys_app;
 GRANT USAGE ON SCHEMA terasologykeys TO terasologykeys_app;
 REVOKE ALL ON ALL FUNCTIONS IN SCHEMA terasologykeys FROM terasologykeys_app;
 
-GRANT EXECUTE ON FUNCTION post_user_account(VARCHAR(40), CHAR(64), CHAR(64)) TO terasologykeys_app;
+GRANT EXECUTE ON FUNCTION post_user_account(JSON) TO terasologykeys_app;
+GRANT EXECUTE ON FUNCTION post_session(JSON) TO terasologykeys_app;
+GRANT EXECUTE ON FUNCTION get_session(JSON, TEXT) TO terasologykeys_app;
+GRANT EXECUTE ON FUNCTION delete_session(JSON, TEXT) TO terasologykeys_app;

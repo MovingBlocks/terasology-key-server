@@ -10,11 +10,11 @@ const expressPostgres = require('express-postgres-sp')(config.db);
 app.use(bodyParser.json());
 app.all(['/api/:resource', '/api/:resource/:argument'], expressPostgres({
   reqToSPName: req => req.method + '_' + req.params.resource,
-  inputMode: req => {
-    if(req.params.argument !== undefined)
-      req.body.urlArgument = req.params.argument;
-    return req.body;
-  },
-  outputMode: 'jsonString'
+  inputMode: req => (req.params.argument !== undefined ?
+    {body: req.body, urlArgument: req.params.argument} : {body: req.body}),
+  outputMode: (spName, result, res) => {
+    const val = result.rows[0][spName.toLowerCase()];
+    return val ? res.json(val) : res.end();
+  }
 }));
 app.listen(config.listenPort, () => console.log("Server listening"));
