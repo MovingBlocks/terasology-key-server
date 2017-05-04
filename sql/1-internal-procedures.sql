@@ -36,3 +36,12 @@ CREATE FUNCTION json_identity(cl_id client_identity, cl_crt public_cert, srv_crt
       'clientPrivate', json_private_cert(cl_id.private_cert_modulus, cl_id.private_cert_exponent)
       ) AS result;
 $$ LANGUAGE sql;
+
+CREATE FUNCTION insert_public_cert(cert JSON) RETURNS INT AS $$
+  INSERT INTO public_cert(id, modulus, exponent, signature) VALUES(
+    (cert->>'id')::UUID,
+    decode(cert->>'modulus', 'base64'),
+    decode(cert->>'exponent', 'base64'),
+    decode(cert->>'signature', 'base64')
+    ) RETURNING internal_id AS result;
+$$ LANGUAGE sql;

@@ -41,6 +41,7 @@ CREATE FUNCTION delete_session(body JSON, urlArgument TEXT) RETURNS VOID AS $$
   END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- client_identity
 CREATE FUNCTION get_client_identity(body JSON) RETURNS JSON AS $$
   DECLARE
     userID INT;
@@ -64,5 +65,26 @@ CREATE FUNCTION get_client_identity(body JSON, urlArgument TEXT) RETURNS JSON AS
         JOIN public_cert CL_CRT ON CL_ID.public_cert_id = CL_CRT.internal_id
         JOIN public_cert SRV_CRT ON CL_ID.server_public_cert_id = SRV_CRT.internal_id
       WHERE CL_ID.user_account_id = userID AND SRV_CRT.id = urlArgument::UUID;
+  END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE FUNCTION post_client_identity(body JSON) RETURNS VOID AS $$
+  DECLARE
+    userID INT;
+    serverCertId INT;
+    clientCertId INT;
+    privateModulus BYTEA;
+    privateExponent BYTEA;
+  BEGIN
+    userID := auth((body->>'sessionToken')::UUID);
+    privateModulus := decode((body->'clientPrivate')->>'modulus', 'base64');
+    privateExponent := decode((body->'clientPrivate')->>'exponent', 'base64');
+    clientCertId := insert_public_cert(body->'clientPublic');
+    SELECT internal_id INTO serverCertId FROM public_cert WHERE id = ((body->'server')->>'id')::UUID;
+    IF NOT FOUND THEN
+      serverCertId := insert_public_cert(body->'server');
+    END IF;
+    INSERT INTO client_identity(user_account_id, public_cert_id, server_public_cert_id, private_cert_modulus, private_cert_exponent)
+      VALUES (userID, clientCertID, serverCertId, privateModulus, privateExponent);
   END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

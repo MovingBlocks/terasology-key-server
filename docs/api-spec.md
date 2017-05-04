@@ -14,7 +14,7 @@ The checkbox indicates whether an action has been implemented (checked) or is pl
 
 ## /api/client_identity
 - [x] GET: given a session token, returns all the client identities for the user which owns the session
-- [ ] POST: given a session token, a server public certificate and a client identity, stores the client identity associated with the specified server with the user which owns the session.
+- [x] POST: given a session token, a server public certificate and a client identity, stores the client identity associated with the specified server for the user which owns the session.
 
 ### /api/client_identity/{serverID}
 - [x] GET: given a session token and a server ID, returns the identity of the user which owns the session on the specified server.
