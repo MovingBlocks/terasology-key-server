@@ -40,3 +40,29 @@ CREATE FUNCTION delete_session(body JSON, urlArgument TEXT) RETURNS VOID AS $$
     DELETE FROM session WHERE token = urlArgument::UUID;
   END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE FUNCTION get_client_identity(body JSON) RETURNS JSON AS $$
+  DECLARE
+    userID INT;
+  BEGIN
+    userID := auth((body->>'sessionToken')::UUID);
+    RETURN json_build_object('clientIdentities', json_agg(json_identity(CL_ID, CL_CRT, SRV_CRT)))
+      FROM client_identity CL_ID
+        JOIN public_cert CL_CRT ON CL_ID.public_cert_id = CL_CRT.internal_id
+        JOIN public_cert SRV_CRT ON CL_ID.server_public_cert_id = SRV_CRT.internal_id
+      WHERE CL_ID.user_account_id = userID;
+  END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE FUNCTION get_client_identity(body JSON, urlArgument TEXT) RETURNS JSON AS $$
+  DECLARE
+    userID INT;
+  BEGIN
+    userID := auth((body->>'sessionToken')::UUID);
+    RETURN json_build_object('clientIdentity', json_identity(CL_ID, CL_CRT, SRV_CRT))
+      FROM client_identity CL_ID
+        JOIN public_cert CL_CRT ON CL_ID.public_cert_id = CL_CRT.internal_id
+        JOIN public_cert SRV_CRT ON CL_ID.server_public_cert_id = SRV_CRT.internal_id
+      WHERE CL_ID.user_account_id = userID AND SRV_CRT.id = urlArgument::UUID;
+  END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

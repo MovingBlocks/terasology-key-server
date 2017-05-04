@@ -21,3 +21,5 @@ GRANT EXECUTE ON FUNCTION post_user_account(JSON) TO terasologykeys_app;
 GRANT EXECUTE ON FUNCTION post_session(JSON) TO terasologykeys_app;
 GRANT EXECUTE ON FUNCTION get_session(JSON, TEXT) TO terasologykeys_app;
 GRANT EXECUTE ON FUNCTION delete_session(JSON, TEXT) TO terasologykeys_app;
+GRANT EXECUTE ON FUNCTION get_client_identity(JSON) TO terasologykeys_app;
+GRANT EXECUTE ON FUNCTION get_client_identity(JSON, TEXT) TO terasologykeys_app;

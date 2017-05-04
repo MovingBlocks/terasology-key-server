@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const expressPostgres = require('express-postgres-sp')(config.db);
 
 app.use(bodyParser.json());
+//app.use((req, res, next) => {console.log(req.body); next();}); //TODO remove (logging)
 app.all(['/api/:resource', '/api/:resource/:argument'], expressPostgres({
   reqToSPName: req => req.method + '_' + req.params.resource,
   inputMode: req => (req.params.argument !== undefined ?

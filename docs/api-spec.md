@@ -13,8 +13,8 @@ The checkbox indicates whether an action has been implemented (checked) or is pl
 - [x] DELETE: forces expiration of a session, given the token (logout).
 
 ## /api/client_identity
-- [ ] GET: given a session token, returns all the client identities for the user which owns the session
+- [x] GET: given a session token, returns all the client identities for the user which owns the session
 - [ ] POST: given a session token, a server public certificate and a client identity, stores the client identity associated with the specified server with the user which owns the session.
 
 ### /api/client_identity/{serverID}
-- [ ] GET: given a session token and a server ID, returns the identity of the user which owns the session on the specified server.
+- [x] GET: given a session token and a server ID, returns the identity of the user which owns the session on the specified server.
