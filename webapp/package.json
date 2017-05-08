@@ -18,7 +18,8 @@
   "homepage": "https://github.com/gianluca-nitti/terasology-key-server#readme",
   "dependencies": {
     "body-parser": "^1.17.1",
+    "builtin-status-codes": "^3.0.0",
     "express": "^4.15.2",
-    "express-postgres-sp": "^0.1.0"
+    "express-postgres-sp": "^0.1.1"
   }
 }

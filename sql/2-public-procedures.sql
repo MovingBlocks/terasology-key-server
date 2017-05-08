@@ -4,7 +4,7 @@
 CREATE FUNCTION post_user_account(body JSON) RETURNS VOID AS $$
   BEGIN
     IF (body->>'password1') <> (body->>'password2') THEN
-      RAISE EXCEPTION 'Passwords do not match';
+      PERFORM raiseCustomException(400, 'Passwords do not match');
     END IF;
     INSERT INTO user_account (login, password) VALUES (body->>'login', body->>'password1');
   END;
@@ -18,7 +18,7 @@ CREATE FUNCTION post_session(body JSON) RETURNS JSON AS $$
   BEGIN
     SELECT id INTO userID FROM user_account U WHERE U.login = (body->>'login') AND (U.password = body->>'password');
     IF NOT FOUND THEN
-      RAISE EXCEPTION 'Invalid login or password';
+      PERFORM raiseCustomException(403, 'Invalid login or password');
     END IF;
     INSERT INTO session(user_account_id, login_timestamp) VALUES (userID, CURRENT_TIMESTAMP) RETURNING token INTO s_token;
     RETURN json_build_object('token', s_token);

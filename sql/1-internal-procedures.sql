@@ -1,12 +1,20 @@
 -- stored procedures not accessible to the app user
 
+CREATE FUNCTION raiseCustomException(httpStatus INT, message TEXT) RETURNS VOID AS $$
+  BEGIN
+    --RAISE EXCEPTION '{"status": %, "message": "%"}', httpStatus, message
+    --  USING HINT = 'customError';
+    RAISE EXCEPTION 'customError' USING DETAIL = json_build_object('status', httpStatus, 'message', message);
+  END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION auth(sessionToken UUID) RETURNS INT AS $$
   DECLARE
     userID INT;
   BEGIN
     SELECT user_account_id INTO userID FROM session WHERE token = sessionToken;
     IF NOT FOUND THEN
-      RAISE EXCEPTION 'Invalid session token';
+      PERFORM raiseCustomException(403, 'Invalid session token');
     END IF;
     -- TODO: check if session has expired
     RETURN userID;
