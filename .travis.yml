@@ -1,17 +1,17 @@
 sudo: required
-language: generic
-services:
-  - postgresql
-addons:
-  apt:
-    packages:
-      - python-setuptools
-      - postgresql-server-dev-all
+dist: trusty
+language: node_js
 install:
+  - sudo apt-get install python-setuptools postgresql-server-dev-9.6
   - sudo easy_install pgxnclient
   - sudo pgxn install pgtap
+addons:
+  postgresql: "9.6"
+services:
+    - postgresql
 before_script:
   - psql -U postgres -c "CREATE ROLE test_admin PASSWORD 'md5b5fba89dc8b40773ed48b0505af53f95' NOSUPERUSER CREATEDB CREATEROLE INHERIT LOGIN"
   - psql -U postgres -c "CREATE DATABASE test WITH OWNER test_admin;"
-  - PGHOST=localhost PGUSER=test PGPASSWORD=test psql -U test_admin -d test -c "CREATE EXTENSION pgtap;"
-  - PGHOST=localhost PGUSER=test PGPASSWORD=test psql -U test_admin -d test -f sql/*.sql
+  - PGHOST=localhost PGUSER=test_admin PGPASSWORD=test psql -d test -c "CREATE EXTENSION pgtap;"
+script:
+  - PGHOST=localhost PGUSER=test_admin PGPASSWORD=test cat sql/*.sql | psql -d test
