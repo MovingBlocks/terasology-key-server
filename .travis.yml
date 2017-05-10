@@ -1,0 +1,17 @@
+sudo: required
+language: generic
+services:
+  - postgresql
+addons:
+  apt:
+    packages:
+      - python-setuptools
+      - postgresql-server-dev-all
+install:
+  - sudo easy_install pgxnclient
+  - sudo pgxn install pgtap
+before_script:
+  - psql -U postgres -c "CREATE ROLE test_admin PASSWORD 'md5b5fba89dc8b40773ed48b0505af53f95' NOSUPERUSER CREATEDB CREATEROLE INHERIT LOGIN"
+  - psql -U postgres -c "CREATE DATABASE test WITH OWNER test_admin;"
+  - PGHOST=localhost PGUSER=test PGPASSWORD=test psql -U test_admin -d test -c "CREATE EXTENSION pgtap;"
+  - PGHOST=localhost PGUSER=test PGPASSWORD=test psql -U test_admin -d test -f sql/*.sql
