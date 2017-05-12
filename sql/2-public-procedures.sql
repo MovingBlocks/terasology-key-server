@@ -20,7 +20,7 @@ CREATE FUNCTION post_session(body JSON) RETURNS JSON AS $$
     IF NOT FOUND THEN
       PERFORM raiseCustomException(403, 'Invalid login or password');
     END IF;
-    INSERT INTO session(user_account_id, login_timestamp) VALUES (userID, CURRENT_TIMESTAMP) RETURNING token INTO s_token;
+    INSERT INTO session(user_account_id) VALUES (userID) RETURNING token INTO s_token;
     RETURN json_build_object('token', s_token);
   END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

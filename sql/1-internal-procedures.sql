@@ -2,8 +2,6 @@
 
 CREATE FUNCTION raiseCustomException(httpStatus INT, message TEXT) RETURNS VOID AS $$
   BEGIN
-    --RAISE EXCEPTION '{"status": %, "message": "%"}', httpStatus, message
-    --  USING HINT = 'customError';
     RAISE EXCEPTION 'customError' USING DETAIL = json_build_object('status', httpStatus, 'message', message);
   END;
 $$ LANGUAGE plpgsql;

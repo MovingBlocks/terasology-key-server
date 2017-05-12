@@ -14,7 +14,7 @@ CREATE TABLE user_account(
 CREATE TABLE session (
   token UUID PRIMARY KEY DEFAULT public.uuid_generate_v4(),
   user_account_id INT NOT NULL REFERENCES user_account(id) ON UPDATE CASCADE ON DELETE NO ACTION,
-  login_timestamp TIMESTAMP NOT NULL
+  login_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE public_cert (

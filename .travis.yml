@@ -2,16 +2,18 @@ sudo: required
 dist: trusty
 language: node_js
 install:
-  - sudo apt-get install python-setuptools postgresql-server-dev-9.6
+  - sudo apt-get install python-setuptools postgresql-server-dev-9.6 postgresql-contrib
   - sudo easy_install pgxnclient
   - sudo pgxn install pgtap
+  - sudo PERL_MM_USE_DEFAULT=1 cpan TAP::Parser::SourceHandler::pgTAP
 addons:
   postgresql: "9.6"
 services:
     - postgresql
 before_script:
-  - psql -U postgres -c "CREATE ROLE test_admin PASSWORD 'md5b5fba89dc8b40773ed48b0505af53f95' NOSUPERUSER CREATEDB CREATEROLE INHERIT LOGIN"
-  - psql -U postgres -c "CREATE DATABASE test WITH OWNER test_admin;"
-  - PGHOST=localhost PGUSER=test_admin PGPASSWORD=test psql -d test -c "CREATE EXTENSION pgtap;"
+  - psql -U postgres -c "CREATE DATABASE terasologykeys;"
+  - psql -U postgres -d terasologykeys -c "CREATE EXTENSION \"uuid-ossp\";"
+  - psql -U postgres -d terasologykeys -c "CREATE EXTENSION pgtap;"
 script:
-  - PGHOST=localhost PGUSER=test_admin PGPASSWORD=test cat sql/*.sql | psql -d test
+  - cat sql/*.sql | psql -d terasologykeys
+  - pg_prove -U postgres -d terasologykeys sql/test/*.sql
