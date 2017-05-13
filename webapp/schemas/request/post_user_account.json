@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "id": "request_post_user_account",
+  "type": "object",
+  "properties": {
+    "login": {"type": "string"},
+    "password1": {"type": "string"},
+    "password2": {"type": "string"}
+  },
+  "required": ["login", "password1", "password2"],
+  "additionalProperties": false
+}

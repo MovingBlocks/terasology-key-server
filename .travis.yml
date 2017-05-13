@@ -6,6 +6,7 @@ install:
   - sudo easy_install pgxnclient
   - sudo pgxn install pgtap
   - sudo PERL_MM_USE_DEFAULT=1 cpan TAP::Parser::SourceHandler::pgTAP
+  - npm install -g ajv-cli
 addons:
   postgresql: "9.6"
 services:
@@ -15,5 +16,9 @@ before_script:
   - psql -U postgres -d terasologykeys -c "CREATE EXTENSION \"uuid-ossp\";"
   - psql -U postgres -d terasologykeys -c "CREATE EXTENSION pgtap;"
 script:
+  # install database (test SQL syntax)
   - cat sql/*.sql | psql -d terasologykeys
+  # unit test stored procedures
   - pg_prove -U postgres -d terasologykeys sql/test/*.sql
+  # validate JSON schemas
+  - ajv compile -s 'webapp/schemas/*/*.json' -r 'webapp/schemas/*/*.json'
