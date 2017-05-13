@@ -1,0 +1,10 @@
+BEGIN;
+SET search_path TO terasologykeys, public;
+SELECT plan(2);
+PREPARE bad_pass AS SELECT post_user_account('{"login": "test", "password1": "test1", "password2": "test2"}'::JSON);
+SELECT throws_ok('bad_pass', 'customError');
+SELECT post_user_account('{"login": "test", "password1": "pass", "password2": "pass"}'::JSON);
+PREPARE expected AS (SELECT 'test'::TEXT AS login, 'pass'::TEXT AS password);
+SELECT set_has('SELECT login, password FROM user_account', 'expected');
+SELECT finish();
+ROLLBACK;
