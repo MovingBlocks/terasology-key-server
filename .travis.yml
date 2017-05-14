@@ -1,6 +1,8 @@
 sudo: required
 dist: trusty
 language: node_js
+node_js:
+  - "7"
 install:
   - sudo apt-get install python-setuptools postgresql-server-dev-9.6 postgresql-contrib
   - sudo easy_install pgxnclient
@@ -22,3 +24,5 @@ script:
   - pg_prove -U postgres -d terasologykeys sql/test/*.sql
   # validate JSON schemas
   - ajv compile -s 'webapp/schemas/*/*.json' -r 'webapp/schemas/*/*.json'
+  # run integration test
+  - cd webapp && npm install && npm test
