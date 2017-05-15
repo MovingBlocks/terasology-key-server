@@ -106,21 +106,23 @@ INSERT INTO user_account(id, login, password) VALUES (3, 'yetAnotherUser', 'yetA
 INSERT INTO session(token, user_account_id) VALUES ('e306a4f8-b178-4e27-9476-f8c8f57f07dc', 3);
 SELECT post_client_identity('{
   "sessionToken": "e306a4f8-b178-4e27-9476-f8c8f57f07dc",
-  "server": {
-    "id": "55833d5b-1671-4a5d-a4cd-58dcc04e3235",
-    "modulus": "cHFy",
-    "exponent": "c3R1",
-    "signature": "dnd4"
-  },
-  "clientPublic": {
-    "id": "51409c50-7ba2-4021-b175-f47e28d1fd58",
-    "modulus": "Z2hp",
-    "exponent": "amts",
-    "signature": "bW5v"
-  },
-  "clientPrivate": {
-    "modulus": "YWJj",
-    "exponent": "ZGVm"
+  "clientIdentity": {
+    "server": {
+      "id": "55833d5b-1671-4a5d-a4cd-58dcc04e3235",
+      "modulus": "cHFy",
+      "exponent": "c3R1",
+      "signature": "dnd4"
+    },
+    "clientPublic": {
+      "id": "51409c50-7ba2-4021-b175-f47e28d1fd58",
+      "modulus": "Z2hp",
+      "exponent": "amts",
+      "signature": "bW5v"
+    },
+    "clientPrivate": {
+      "modulus": "YWJj",
+      "exponent": "ZGVm"
+    }
   }
 }');
 PREPARE inserted_ident AS SELECT CL_ID.private_cert_modulus AS prvMod, CL_ID.private_cert_exponent AS prvExp,

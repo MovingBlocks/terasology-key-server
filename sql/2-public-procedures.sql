@@ -47,7 +47,7 @@ CREATE FUNCTION get_client_identity(body JSON) RETURNS JSON AS $$
     userID INT;
   BEGIN
     userID := auth((body->>'sessionToken')::UUID);
-    RETURN json_build_object('clientIdentities', json_agg(json_identity(CL_ID, CL_CRT, SRV_CRT)))
+    RETURN json_build_object('clientIdentities', COALESCE(json_agg(json_identity(CL_ID, CL_CRT, SRV_CRT)), '[]'))
       FROM client_identity CL_ID
         JOIN public_cert CL_CRT ON CL_ID.public_cert_id = CL_CRT.internal_id
         JOIN public_cert SRV_CRT ON CL_ID.server_public_cert_id = SRV_CRT.internal_id
@@ -71,18 +71,20 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE FUNCTION post_client_identity(body JSON) RETURNS VOID AS $$
   DECLARE
     userID INT;
+    clientIdentity JSON;
     serverCertId INT;
     clientCertId INT;
     privateModulus BYTEA;
     privateExponent BYTEA;
   BEGIN
     userID := auth((body->>'sessionToken')::UUID);
-    privateModulus := decode((body->'clientPrivate')->>'modulus', 'base64');
-    privateExponent := decode((body->'clientPrivate')->>'exponent', 'base64');
-    clientCertId := insert_public_cert(body->'clientPublic');
-    SELECT internal_id INTO serverCertId FROM public_cert WHERE id = ((body->'server')->>'id')::UUID;
+    clientIdentity := body->'clientIdentity';
+    privateModulus := decode((clientIdentity->'clientPrivate')->>'modulus', 'base64');
+    privateExponent := decode((clientIdentity->'clientPrivate')->>'exponent', 'base64');
+    clientCertId := insert_public_cert(clientIdentity->'clientPublic');
+    SELECT internal_id INTO serverCertId FROM public_cert WHERE id = ((clientIdentity->'server')->>'id')::UUID;
     IF NOT FOUND THEN
-      serverCertId := insert_public_cert(body->'server');
+      serverCertId := insert_public_cert(clientIdentity->'server');
     END IF;
     INSERT INTO client_identity(user_account_id, public_cert_id, server_public_cert_id, private_cert_modulus, private_cert_exponent)
       VALUES (userID, clientCertID, serverCertId, privateModulus, privateExponent);

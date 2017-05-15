@@ -9,6 +9,7 @@ install:
   - sudo pgxn install pgtap
   - sudo PERL_MM_USE_DEFAULT=1 cpan TAP::Parser::SourceHandler::pgTAP
   - npm install -g ajv-cli
+  - cd webapp && npm install && cd ..
 addons:
   postgresql: "9.6"
 services:
@@ -25,4 +26,4 @@ script:
   # validate JSON schemas
   - ajv compile -s 'webapp/schemas/*/*.json' -r 'webapp/schemas/*/*.json'
   # run integration test
-  - cd webapp && npm install && npm test
+  - cd webapp && npm test
