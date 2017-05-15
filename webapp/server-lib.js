@@ -1,13 +1,34 @@
-module.exports = (dbConfig) => {
-  const path = require('path');
-  const app = require('express')();
-  const bodyParser = require('body-parser');
-  const statusCodes = require('builtin-status-codes');
-  const expressPostgres = require('express-postgres-sp')(dbConfig);
+const path = require('path');
+const app = require('express')();
+const ajv = require('ajv')({allErrors: true});
+const bodyParser = require('body-parser');
+const statusCodes = require('builtin-status-codes');
+const expressPostgresModule = require('express-postgres-sp');
+const schemaLoader = require(path.join(__dirname, 'schemaLoader'));
 
-  const apiPaths = ['/api/:resource', '/api/:resource/:argument'];
+const apiPaths = ['/api/:resource', '/api/:resource/:argument'];
+
+module.exports = (dbConfig) => {
+  const expressPostgres = expressPostgresModule(dbConfig);
+  const schemaFiles = schemaLoader.list();
+  const schemaList = schemaLoader.names(schemaFiles);
+  schemaLoader.load(schemaFiles, ajv);
 
   app.use(bodyParser.json());
+  app.all(apiPaths, (req, res, next) => {
+    const baseSchemaName = 'request_' + req.method.toLowerCase() + '_' + req.params.resource.toLowerCase();
+    let ok;
+    if(schemaList.indexOf(baseSchemaName) > -1){
+      if(ajv.validate(baseSchemaName, req.body))
+        next();
+      else
+        res.status(400).json({error: 'JSON data validation against schema ' + baseSchemaName + ' failed'});
+    }else
+      if(Object.keys(req.body).length === 0)
+        next();
+      else
+        res.status(400).json({error: 'Request to the specified endpoint with the specified method must not send any payload'});
+  });
   app.all(apiPaths, expressPostgres({
     reqToSPName: req => req.method + '_' + req.params.resource,
     hideUnallowed: true,
