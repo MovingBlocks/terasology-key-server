@@ -6,15 +6,23 @@ CREATE FUNCTION raiseCustomException(httpStatus INT, message TEXT) RETURNS VOID 
   END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION session_timestamp_valid(t TIMESTAMP) RETURNS BOOLEAN AS $$
+  SELECT CURRENT_TIMESTAMP - t < '12 hours'::INTERVAL;
+$$ LANGUAGE sql;
+
+CREATE FUNCTION clean_expired_sessions() RETURNS VOID AS $$
+  DELETE FROM session WHERE NOT session_timestamp_valid(login_timestamp);
+$$ LANGUAGE sql; --TODO SECURITY DEFINER
+
 CREATE FUNCTION auth(sessionToken UUID) RETURNS INT AS $$
   DECLARE
     userID INT;
   BEGIN
-    SELECT user_account_id INTO userID FROM session WHERE token = sessionToken;
+    SELECT user_account_id INTO userID FROM session
+      WHERE token = sessionToken AND session_timestamp_valid(login_timestamp);
     IF NOT FOUND THEN
-      PERFORM raiseCustomException(403, 'Invalid session token');
+      PERFORM raiseCustomException(403, 'Invalid or expired session token');
     END IF;
-    -- TODO: check if session has expired
     RETURN userID;
   END;
 $$ LANGUAGE plpgsql;

@@ -7,6 +7,8 @@ CREATE FUNCTION post_user_account(body JSON) RETURNS VOID AS $$
       PERFORM raiseCustomException(400, 'Passwords do not match');
     END IF;
     INSERT INTO user_account (login, password) VALUES (body->>'login', body->>'password1');
+  EXCEPTION
+      WHEN unique_violation THEN PERFORM raiseCustomException(409, 'The specified username is not available.');
   END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -88,5 +90,7 @@ CREATE FUNCTION post_client_identity(body JSON) RETURNS VOID AS $$
     END IF;
     INSERT INTO client_identity(user_account_id, public_cert_id, server_public_cert_id, private_cert_modulus, private_cert_exponent)
       VALUES (userID, clientCertID, serverCertId, privateModulus, privateExponent);
+    EXCEPTION
+      WHEN unique_violation THEN PERFORM raiseCustomException(409, 'A client identity certificate with the same ID already exists.');
   END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

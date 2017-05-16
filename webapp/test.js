@@ -28,8 +28,7 @@ let user1Tok, user2Tok;
 const testRequests = [
   {method: 'post', endpoint: 'user_account', argument: null, data: {login: 'test', password1: 'a', password2: 'b'}, expectedStatus: 400, expectedData: null, description: 'wrong password registration'},
   {method: 'post', endpoint: 'user_account', argument: null, data: {login: 'user1', password1: 'a', password2: 'a'}, expectedStatus: 200, expectedData: null, description: 'ok registration user1'},
-  //TODO: choose a better status code
-  {method: 'post', endpoint: 'user_account', argument: null, data: {login: 'user1', password1: 'a', password2: 'a'}, expectedStatus: 500, expectedData: null, description: 'duplicated username'},
+  {method: 'post', endpoint: 'user_account', argument: null, data: {login: 'user1', password1: 'a', password2: 'a'}, expectedStatus: 409, expectedData: null, description: 'duplicated username'},
   {method: 'post', endpoint: 'session', argument: null, data: {login: 'user1', password: 'a'}, expectedStatus: 200, expectedData: null, description: 'ok login', callback: data => user1Tok = data.token},
   () => ({method: 'get', endpoint: 'session', argument: user1Tok, data: null, expectedStatus: 200, expectedData: {'login': 'user1'}, description: 'get login name from session token'}),
   () => ({method: 'get', endpoint: 'client_identity', argument: null, data: null, expectedStatus: 400, expectedData: null, description: 'must not be able to get client identities without a session token'}),
@@ -37,8 +36,7 @@ const testRequests = [
   () => ({method: 'post', endpoint: 'client_identity', argument: null, data: {clientIdentity: user1_id1}, expectedStatus: 400, expectedData: null, description: 'must not be able to upload a client identity withoud a session token'}),
   () => ({method: 'post', endpoint: 'client_identity', argument: null, data: {sessionToken: user1Tok, clientIdentity: {}}, expectedStatus: 400, expectedData: null, description: 'must not be able to upload a client identity in an invalid format'}),
   () => ({method: 'post', endpoint: 'client_identity', argument: null, data: {sessionToken: user1Tok, clientIdentity: user1_id1}, expectedStatus: 200, expectedData: null, description: 'upload a client identity for user1'}),
-  //TODO: choose a better status code
-  () => ({method: 'post', endpoint: 'client_identity', argument: null, data: {sessionToken: user1Tok, clientIdentity: user1_id1}, expectedStatus: 500, expectedData: null, description: 'must not be able upload a client identity with already existing id'}),
+  () => ({method: 'post', endpoint: 'client_identity', argument: null, data: {sessionToken: user1Tok, clientIdentity: user1_id1}, expectedStatus: 409, expectedData: null, description: 'must not be able upload a client identity with already existing id'}),
   () => ({method: 'delete', endpoint: 'session', argument: user1Tok, data: null, expectedStatus: 200, expectedData: null, description: 'logout user1'}),
   () => ({method: 'post', endpoint: 'client_identity', argument: null, data: {sessionToken: user1Tok, clientIdentity: user1_id2}, expectedStatus: 403, expectedData: null, description: 'must not be able upload a client identity using an expired session token'}),
   {method: 'post', endpoint: 'user_account', argument: null, data: {login: 'user2', password1: 'b', password2: 'b'}, expectedStatus: 200, expectedData: null, description: 'register user2'},
