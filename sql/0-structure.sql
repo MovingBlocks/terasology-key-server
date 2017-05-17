@@ -8,7 +8,8 @@ SET search_path TO 'terasologykeys';
 CREATE TABLE user_account(
   id SERIAL PRIMARY KEY,
   login VARCHAR(40) NOT NULL UNIQUE,
-  password CHAR(64) NOT NULL
+  password TEXT NOT NULL,
+  CHECK(login ~ '^[A-Za-z0-9_]{4,40}$')
 );
 
 CREATE TABLE session (

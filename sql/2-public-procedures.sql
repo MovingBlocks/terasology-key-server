@@ -6,9 +6,12 @@ CREATE FUNCTION post_user_account(body JSON) RETURNS VOID AS $$
     IF (body->>'password1') <> (body->>'password2') THEN
       PERFORM raiseCustomException(400, 'Passwords do not match');
     END IF;
-    INSERT INTO user_account (login, password) VALUES (body->>'login', body->>'password1');
+    INSERT INTO user_account (login, password) VALUES (body->>'login', crypt(body->>'password1', gen_salt('bf', 8)));
   EXCEPTION
       WHEN unique_violation THEN PERFORM raiseCustomException(409, 'The specified username is not available.');
+      WHEN check_violation OR string_data_right_truncation THEN
+        PERFORM raiseCustomException(400, 'The username must be long characters at least 4 and 40 at most,
+        and must contain only alphanumeric characters and underscores.');
   END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -18,7 +21,7 @@ CREATE FUNCTION post_session(body JSON) RETURNS JSON AS $$
     userID INT;
     s_token UUID;
   BEGIN
-    SELECT id INTO userID FROM user_account U WHERE U.login = (body->>'login') AND (U.password = body->>'password');
+    SELECT id INTO userID FROM user_account U WHERE U.login = (body->>'login') AND (U.password = crypt(body->>'password', U.password));
     IF NOT FOUND THEN
       PERFORM raiseCustomException(403, 'Invalid login or password');
     END IF;

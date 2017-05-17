@@ -26,6 +26,9 @@ const user2_id1 = {"server": {"id": "ce49c253-1065-4dc0-a11b-fc06f16379ef","modu
 //Integration test to simulate a normal usage scenario
 let user1Tok, user2Tok;
 const testRequests = [
+  {method: 'post', endpoint: 'user_account', argument: null, data: {login: 'a', password1: 'a', password2: 'a'}, expectedStatus: 400, expectedData: null, description: 'login too short'},
+  {method: 'post', endpoint: 'user_account', argument: null, data: {login: 'thisStringIsVeryLongLongerThan40Characters', password1: 'a', password2: 'a'}, expectedStatus: 400, expectedData: null, description: 'login too long'},
+  {method: 'post', endpoint: 'user_account', argument: null, data: {login: ' invalid.#$chars', password1: 'a', password2: 'a'}, expectedStatus: 400, expectedData: null, description: 'invalid characters in login name'},
   {method: 'post', endpoint: 'user_account', argument: null, data: {login: 'test', password1: 'a', password2: 'b'}, expectedStatus: 400, expectedData: null, description: 'wrong password registration'},
   {method: 'post', endpoint: 'user_account', argument: null, data: {login: 'user1', password1: 'a', password2: 'a'}, expectedStatus: 200, expectedData: null, description: 'ok registration user1'},
   {method: 'post', endpoint: 'user_account', argument: null, data: {login: 'user1', password1: 'a', password2: 'a'}, expectedStatus: 409, expectedData: null, description: 'duplicated username'},

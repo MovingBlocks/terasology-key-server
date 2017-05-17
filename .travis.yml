@@ -16,6 +16,7 @@ services:
     - postgresql
 before_script:
   - psql -U postgres -c "CREATE DATABASE terasologykeys;"
+  - psql -U postgres -d terasologykeys -c "CREATE EXTENSION pgcrypto;"
   - psql -U postgres -d terasologykeys -c "CREATE EXTENSION \"uuid-ossp\";"
   - psql -U postgres -d terasologykeys -c "CREATE EXTENSION pgtap;"
 script:

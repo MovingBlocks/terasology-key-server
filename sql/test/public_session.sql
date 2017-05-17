@@ -3,14 +3,13 @@ SET search_path TO terasologykeys, public;
 SELECT plan(4);
 
 -- post
-INSERT INTO user_account(id, login, password) VALUES (1, 'testUser', 'testPass');
+INSERT INTO user_account(id, login, password) VALUES (1, 'testUser', crypt('testPass', gen_salt('bf', 8)));
 PREPARE bad_login AS SELECT post_session('{"login": "testUser", "password": "wrong"}'::JSON);
 SELECT throws_ok('bad_login', 'customError');
-PREPARE ok_login AS SELECT post_session('{"login": "testUser", "password": "testPass"}'::JSON);
 PREPARE ok_login_tok AS SELECT (post_session(
   '{"login": "testUser", "password": "testPass"}'::JSON)->>'token')::UUID;
 PREPARE tok_in_table AS SELECT token FROM session JOIN user_account ON user_account_id=id
-      WHERE login='testUser' AND password='testPass';
+      WHERE login='testUser' AND password=crypt('testPass', password);
 SELECT results_eq('ok_login_tok', 'tok_in_table');
 
 -- get
