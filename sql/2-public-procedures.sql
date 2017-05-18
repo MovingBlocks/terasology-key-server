@@ -4,7 +4,10 @@
 CREATE FUNCTION post_user_account(body JSON) RETURNS VOID AS $$
   BEGIN
     IF (body->>'password1') <> (body->>'password2') THEN
-      PERFORM raiseCustomException(400, 'Passwords do not match');
+      PERFORM raiseCustomException(400, 'Entered passwords do not match');
+    END IF;
+    IF length(body->>'password1') < 8 THEN
+      PERFORM raiseCustomException(400, 'The password must be at least 8 characters long.');
     END IF;
     INSERT INTO user_account (login, password) VALUES (body->>'login', crypt(body->>'password1', gen_salt('bf', 8)));
   EXCEPTION
