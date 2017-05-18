@@ -10,8 +10,7 @@ CREATE FUNCTION post_user_account(body JSON) RETURNS VOID AS $$
   EXCEPTION
       WHEN unique_violation THEN PERFORM raiseCustomException(409, 'The specified username is not available.');
       WHEN check_violation OR string_data_right_truncation THEN
-        PERFORM raiseCustomException(400, 'The username must be long characters at least 4 and 40 at most,
-        and must contain only alphanumeric characters and underscores.');
+        PERFORM raiseCustomException(400, 'The username must be at least 4 and at most 40 characters long, and must contain alphanumeric characters and underscores only.');
   END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 

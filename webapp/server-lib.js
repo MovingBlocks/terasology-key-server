@@ -52,5 +52,8 @@ module.exports = (dbConfig) => {
     }
   });
 
+  //serve the simple HTML registration page
+  app.get('/', (req, res) => res.sendFile(path.join(__dirname, '/static/register.html')));
+
   return app;
 };

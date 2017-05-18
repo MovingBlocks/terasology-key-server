@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<!--
+  Parts of the code in this file are adapted from the following template:
+  https://bootsnipp.com/snippets/featured/register-page
+  Licensed under the MIT license as specified here:
+  https://bootsnipp.com/license
+-->
+<html>
+<head>
+  <link
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+    crossorigin="anonymous">
+  <style>
+    .main-login{
+      background-color: #fff;
+      /* shadows and rounded borders */
+      -moz-border-radius: 2px;
+      -webkit-border-radius: 2px;
+      border-radius: 2px;
+      -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+      -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+      box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    }
+    .main-center{
+      margin-top: 30px;
+      margin: 0 auto;
+      max-width: 330px;
+      padding: 40px 40px;
+    }
+  </style>
+
+  <script
+    src="https://code.jquery.com/jquery-3.2.1.min.js"
+    integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+    crossorigin="anonymous"></script>
+  <script>
+    $(document).ready(function(){
+      $(".form-horizontal").submit(function(){
+        $("#regBtn").prop("disabled", true);
+        $.post({
+          url: "/api/user_account",
+          data: JSON.stringify({login: $("#username").val(), password1: $("#password").val(), password2: $("#confirm").val()}),
+          contentType: "application/json",
+          success: function(res){
+            $(".form-horizontal").hide();
+            $("#okAlert").removeClass("hidden");
+          },
+          error: function(res){
+            $("#errAlert").text(res.responseJSON.error);
+            $("#errAlert").removeClass("hidden");
+            $("#regBtn").prop("disabled", false);
+          }
+        });
+        return false;
+      });
+    });
+
+  </script>
+  <title>Terasology client identity storage service</title>
+</head>
+<body>
+  <div class="container">
+    <div class="row main">
+      <div class="panel-heading">
+        <div class="panel-title text-center">
+          <h1 class="title">Terasology client identity storage service</h1>
+          <hr />
+        </div>
+      </div>
+      <div class="text-justify">
+        This server is running a <a href="http://forum.terasology.org/threads/client-identity-cloud-storage-service.1846">client identity storage service</a> for <a href="http://terasology.org">Terasology</a>.<br />
+        On this page, you can register an account which allows you to sync your identity on every game server you play on across your game clients.
+        Once you registered an account, you can enter your credentials in the game to upload your client identity certificates and keep them syncronized with this service; if you later want to play on another computer
+        (or accidentally delete the client's data folder), you can enter the same credentials again and the client will download your identity certificates, so the game servers you join will in turn recognize you.
+      </div>
+      <br />
+      <div class="main-login main-center">
+        <form class="form-horizontal" method="post" action="#">
+
+          <div class="form-group">
+            <label for="username" class="cols-sm-2 control-label">Login name</label>
+            <input type="text" class="form-control" name="username" id="username"  placeholder="The name you want to use to login"/>
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="cols-sm-2 control-label">Password</label>
+            <input type="password" class="form-control" name="password" id="password"  placeholder="Enter a password"/>
+          </div>
+
+          <div class="form-group">
+            <label for="confirm" class="cols-sm-2 control-label">Confirm Password</label>
+            <input type="password" class="form-control" name="confirm" id="confirm"  placeholder="Confirm your password"/>
+          </div>
+
+          <div class="form-group">
+            <button id="regBtn" type="submit" class="btn btn-primary btn-lg btn-block">Register</button>
+          </div>
+
+          <div class="form-group alert alert-danger hidden" id="errAlert"></div>
+        </form>
+        <div class="form-group alert alert-success hidden" id="okAlert">
+          Registration completed succesfully!<br />
+          You can now go in the game client and login with the credentials you just registered.
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
