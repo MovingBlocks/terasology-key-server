@@ -18,16 +18,26 @@ module.exports = (dbConfig) => {
   app.all(apiPaths, (req, res, next) => {
     const baseSchemaName = 'request_' + req.method.toLowerCase() + '_' + req.params.resource.toLowerCase();
     let ok;
+    //temporary workaround, probably it's better to switch to header for auth entirely
+    if(req.get('Session-Token') !== undefined){
+      req.body.sessionToken = req.get('Session-Token');
+      console.log(req.body.sessionToken);
+      console.log(req.method);
+      next();
+      return;
+    }
     if(schemaList.indexOf(baseSchemaName) > -1){
       if(ajv.validate(baseSchemaName, req.body))
         next();
-      else
-        res.status(400).json({error: 'JSON data validation against schema ' + baseSchemaName + ' failed'});
+      else{
+        console.log(req.method + JSON.stringify(req.body));
+        res.status(400).json({error: 'JSON data validation against schema ' + baseSchemaName + ' failed'});}
     }else
-      if(Object.keys(req.body).length === 0)
+      next(); //TODO
+      /*if(Object.keys(req.body).length === 0)
         next();
       else
-        res.status(400).json({error: 'Request to the specified endpoint with the specified method must not send any payload'});
+        res.status(400).json({error: 'Request to the specified endpoint with the specified method must not send any payload'});*/
   });
   app.all(apiPaths, expressPostgres({
     reqToSPName: req => req.method + '_' + req.params.resource,
