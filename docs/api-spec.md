@@ -1,6 +1,4 @@
-# API specification
-
-The checkbox indicates whether an action has been implemented (checked) or is planned (unchecked).
+# Endpoints not requiring special headers
 
 ## /api/user_account
 - [x] POST: register a new user.
@@ -8,7 +6,9 @@ The checkbox indicates whether an action has been implemented (checked) or is pl
 ## /api/session
 - [x] POST: given username and password, creates a new session (login with a new client); returns a session token.
 
-### /api/session/{sessionToken}
+# Endpoints requiring a Session-Token header
+
+## /api/session
 - [x] GET: returns information about the session's owner (e.g. user name)
 - [x] DELETE: forces expiration of a session, given the token (logout).
 

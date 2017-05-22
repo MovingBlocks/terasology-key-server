@@ -20,9 +20,9 @@ INSERT INTO client_identity(user_account_id, public_cert_id, server_public_cert_
   private_cert_modulus, private_cert_exponent) VALUES (1, 3, 4, 'prv3'::BYTEA, 'prv4'::BYTEA);
 
 INSERT INTO session(token, user_account_id) VALUES ('a236721c-ed37-4097-9d45-e6989463a203', 1);
-PREPARE bad_login AS SELECT get_client_identity('{"sessionToken": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}'::JSON);
+PREPARE bad_login AS SELECT get_client_identity(NULL, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'::UUID);
 SELECT throws_ok('bad_login', 'customError');
-PREPARE ok_login AS SELECT get_client_identity('{"sessionToken": "a236721c-ed37-4097-9d45-e6989463a203"}'::JSON)::JSONB;
+PREPARE ok_login AS SELECT get_client_identity(NULL, 'a236721c-ed37-4097-9d45-e6989463a203'::UUID)::JSONB;
 PREPARE expected AS SELECT '{
   "clientIdentities": [
     {
@@ -74,11 +74,11 @@ INSERT INTO public_cert(internal_id, id, modulus, exponent, signature) VALUES (6
 INSERT INTO client_identity(user_account_id, public_cert_id, server_public_cert_id,
   private_cert_modulus, private_cert_exponent) VALUES (2, 5, 6, 'prv5'::BYTEA, 'prv6'::BYTEA);
 INSERT INTO session(token, user_account_id) VALUES ('c5488c11-d047-4844-b57e-126670af6db0', 2);
-PREPARE bad_login AS SELECT get_client_identity('{"sessionToken": "00000000-0000-0000-0000-000000000000"}'::JSON,
-  '2953279c-71e2-46f8-a10f-802ec535bed8')::JSONB;
+PREPARE bad_login AS SELECT get_client_identity(NULL, '2953279c-71e2-46f8-a10f-802ec535bed8',
+  '00000000-0000-0000-0000-000000000000'::UUID)::JSONB;
 SELECT throws_ok('bad_login', 'customError');
-PREPARE ok_login AS SELECT get_client_identity('{"sessionToken": "c5488c11-d047-4844-b57e-126670af6db0"}'::JSON,
-  '2953279c-71e2-46f8-a10f-802ec535bed8')::JSONB;
+PREPARE ok_login AS SELECT get_client_identity(NULL, '2953279c-71e2-46f8-a10f-802ec535bed8',
+  'c5488c11-d047-4844-b57e-126670af6db0'::UUID)::JSONB;
 PREPARE expected AS SELECT '{"clientIdentity": {
   "server": {
     "id": "2953279c-71e2-46f8-a10f-802ec535bed8",
@@ -105,7 +105,6 @@ SELECT setval('public_cert_internal_id_seq', (SELECT MAX(internal_id) FROM publi
 INSERT INTO user_account(id, login, password) VALUES (3, 'yetAnotherUser', 'yetAnotherPass');
 INSERT INTO session(token, user_account_id) VALUES ('e306a4f8-b178-4e27-9476-f8c8f57f07dc', 3);
 SELECT post_client_identity('{
-  "sessionToken": "e306a4f8-b178-4e27-9476-f8c8f57f07dc",
   "clientIdentity": {
     "server": {
       "id": "55833d5b-1671-4a5d-a4cd-58dcc04e3235",
@@ -124,7 +123,7 @@ SELECT post_client_identity('{
       "exponent": "ZGVm"
     }
   }
-}');
+}', 'e306a4f8-b178-4e27-9476-f8c8f57f07dc'::UUID);
 PREPARE inserted_ident AS SELECT CL_ID.private_cert_modulus AS prvMod, CL_ID.private_cert_exponent AS prvExp,
   CL_CRT.id AS pubId, CL_CRT.modulus AS pubMod, CL_CRT.exponent AS pubExp, CL_CRT.signature AS pubSgn,
   SRV_CRT.id AS svrId, SRV_CRT.modulus AS srvMod, SRV_CRT.exponent AS srvExp, SRV_CRT.signature AS srvSgn

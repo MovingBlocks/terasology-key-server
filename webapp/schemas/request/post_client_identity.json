@@ -3,9 +3,8 @@
   "id": "request_post_client_identity",
   "type": "object",
   "properties": {
-    "sessionToken": {"$ref": "common_uuid"},
     "clientIdentity": {"$ref": "common_clientIdentity"}
   },
-  "required": ["sessionToken", "clientIdentity"],
+  "required": ["clientIdentity"],
   "additionalProperties": false
 }

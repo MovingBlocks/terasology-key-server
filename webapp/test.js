@@ -26,32 +26,32 @@ const user2_id1 = {"server": {"id": "ce49c253-1065-4dc0-a11b-fc06f16379ef","modu
 //Integration test to simulate a normal usage scenario
 let user1Tok, user2Tok;
 const testRequests = [
-  {method: 'post', endpoint: 'user_account', argument: null, data: {login: 'a', password1: 'abcdefgh', password2: 'abcdefgh'}, expectedStatus: 400, expectedData: null, description: 'login too short'},
-  {method: 'post', endpoint: 'user_account', argument: null, data: {login: 'thisStringIsVeryLongLongerThan40Characters', password1: 'abcdefgh', password2: 'abcdefgh'}, expectedStatus: 400, expectedData: null, description: 'login too long'},
-  {method: 'post', endpoint: 'user_account', argument: null, data: {login: ' invalid.#$chars', password1: 'abcdefgh', password2: 'abcdefgh'}, expectedStatus: 400, expectedData: null, description: 'invalid characters in login name'},
-  {method: 'post', endpoint: 'user_account', argument: null, data: {login: 'test', password1: 'a', password2: 'a'}, expectedStatus: 400, expectedData: null, description: 'password too short'},
-  {method: 'post', endpoint: 'user_account', argument: null, data: {login: 'test', password1: 'abcdefgh', password2: 'aaaaaaaa'}, expectedStatus: 400, expectedData: null, description: 'unmatching passwords'},
-  {method: 'post', endpoint: 'user_account', argument: null, data: {login: 'user1', password1: 'abcdefgh', password2: 'abcdefgh'}, expectedStatus: 200, expectedData: null, description: 'ok registration user1'},
-  {method: 'post', endpoint: 'user_account', argument: null, data: {login: 'user1', password1: 'abcdefgh', password2: 'abcdefgh'}, expectedStatus: 409, expectedData: null, description: 'duplicated username'},
-  {method: 'post', endpoint: 'session', argument: null, data: {login: 'user1', password: 'abcdefgh'}, expectedStatus: 200, expectedData: null, description: 'ok login', callback: data => user1Tok = data.token},
-  () => ({method: 'get', endpoint: 'session', argument: user1Tok, data: null, expectedStatus: 200, expectedData: {'login': 'user1'}, description: 'get login name from session token'}),
-  () => ({method: 'get', endpoint: 'client_identity', argument: null, data: null, expectedStatus: 400, expectedData: null, description: 'must not be able to get client identities without a session token'}),
-  () => ({method: 'get', endpoint: 'client_identity', argument: null, data: {sessionToken: user1Tok}, expectedStatus: 200, expectedData: {clientIdentities: []}, description: 'no client identities for newly registered user'}),
-  () => ({method: 'post', endpoint: 'client_identity', argument: null, data: {clientIdentity: user1_id1}, expectedStatus: 400, expectedData: null, description: 'must not be able to upload a client identity withoud a session token'}),
-  () => ({method: 'post', endpoint: 'client_identity', argument: null, data: {sessionToken: user1Tok, clientIdentity: {}}, expectedStatus: 400, expectedData: null, description: 'must not be able to upload a client identity in an invalid format'}),
-  () => ({method: 'post', endpoint: 'client_identity', argument: null, data: {sessionToken: user1Tok, clientIdentity: user1_id1}, expectedStatus: 200, expectedData: null, description: 'upload a client identity for user1'}),
-  () => ({method: 'post', endpoint: 'client_identity', argument: null, data: {sessionToken: user1Tok, clientIdentity: user1_id1}, expectedStatus: 409, expectedData: null, description: 'must not be able upload a client identity with already existing id'}),
-  () => ({method: 'delete', endpoint: 'session', argument: user1Tok, data: null, expectedStatus: 200, expectedData: null, description: 'logout user1'}),
-  () => ({method: 'post', endpoint: 'client_identity', argument: null, data: {sessionToken: user1Tok, clientIdentity: user1_id2}, expectedStatus: 403, expectedData: null, description: 'must not be able upload a client identity using an expired session token'}),
-  {method: 'post', endpoint: 'user_account', argument: null, data: {login: 'user2', password1: '123456789', password2: '123456789'}, expectedStatus: 200, expectedData: null, description: 'register user2'},
-  {method: 'post', endpoint: 'session', argument: null, data: {login: 'user2', password: '987654321'}, expectedStatus: 403, expectedData: null, description: 'user 2 login with wrong password'},
-  {method: 'post', endpoint: 'session', argument: null, data: {login: 'user2', password: '123456789'}, expectedStatus: 200, expectedData: null, description: 'ok login', callback: data => user2Tok = data.token},
-  () => ({method: 'post', endpoint: 'client_identity', argument: null, data: {sessionToken: user2Tok, clientIdentity: user2_id1}, expectedStatus: 200, expectedData: null, description: 'upload a client identity for user2 (same server as user1)'}),
-  {method: 'post', endpoint: 'session', argument: null, data: {login: 'user1', password: 'abcdefgh'}, expectedStatus: 200, expectedData: null, description: 'login user1 again', callback: data => user1Tok = data.token},
-  () => ({method: 'post', endpoint: 'client_identity', argument: null, data: {sessionToken: user1Tok, clientIdentity: user1_id2}, expectedStatus: 200, expectedData: null, description: 'upload another client identity for user1'}),
-  () => ({method: 'get', endpoint: 'client_identity', argument: user1_id1.server.id, data: {sessionToken: user1Tok}, expectedStatus: 200, expectedData: {clientIdentity: user1_id1}, description: 'download a client identity for user1'}),
-  () => ({method: 'get', endpoint: 'client_identity', argument: user2_id1.server.id, data: {sessionToken: user2Tok}, expectedStatus: 200, expectedData: {clientIdentity: user2_id1}, description: 'download a client identity for user2'}),
-  () => ({method: 'get', endpoint: 'client_identity', argument: null, data: {sessionToken: user1Tok}, expectedStatus: 200, expectedData: {clientIdentities: [user1_id1, user1_id2]}, description: 'download all the client identities for user1'})
+  {method: 'post', endpoint: 'user_account', token: null, argument: null, data: {login: 'a', password1: 'abcdefgh', password2: 'abcdefgh'}, expectedStatus: 400, expectedData: null, description: 'login too short'},
+  {method: 'post', endpoint: 'user_account', token: null, argument: null, data: {login: 'thisStringIsVeryLongLongerThan40Characters', password1: 'abcdefgh', password2: 'abcdefgh'}, expectedStatus: 400, expectedData: null, description: 'login too long'},
+  {method: 'post', endpoint: 'user_account', token: null, argument: null, data: {login: ' invalid.#$chars', password1: 'abcdefgh', password2: 'abcdefgh'}, expectedStatus: 400, expectedData: null, description: 'invalid characters in login name'},
+  {method: 'post', endpoint: 'user_account', token: null, argument: null, data: {login: 'test', password1: 'a', password2: 'a'}, expectedStatus: 400, expectedData: null, description: 'password too short'},
+  {method: 'post', endpoint: 'user_account', token: null, argument: null, data: {login: 'test', password1: 'abcdefgh', password2: 'aaaaaaaa'}, expectedStatus: 400, expectedData: null, description: 'unmatching passwords'},
+  {method: 'post', endpoint: 'user_account', token: null, argument: null, data: {login: 'user1', password1: 'abcdefgh', password2: 'abcdefgh'}, expectedStatus: 200, expectedData: null, description: 'ok registration user1'},
+  {method: 'post', endpoint: 'user_account', token: null, argument: null, data: {login: 'user1', password1: 'abcdefgh', password2: 'abcdefgh'}, expectedStatus: 409, expectedData: null, description: 'duplicated username'},
+  {method: 'post', endpoint: 'session', token: null, argument: null, data: {login: 'user1', password: 'abcdefgh'}, expectedStatus: 200, expectedData: null, description: 'ok login', callback: data => user1Tok = data.token},
+  () => ({method: 'get', endpoint: 'session', token: user1Tok, argument: null, data: null, expectedStatus: 200, expectedData: {'login': 'user1'}, description: 'get login name from session token'}),
+  () => ({method: 'get', endpoint: 'client_identity', token: null, argument: null, data: null, expectedStatus: 403, expectedData: null, description: 'must not be able to get client identities without a session token'}),
+  () => ({method: 'get', endpoint: 'client_identity', token: user1Tok, argument: null, data: null, expectedStatus: 200, expectedData: {clientIdentities: []}, description: 'no client identities for newly registered user'}),
+  () => ({method: 'post', endpoint: 'client_identity', token: null, argument: null, data: {clientIdentity: user1_id1}, expectedStatus: 403, expectedData: null, description: 'must not be able to upload a client identity without a session token'}),
+  () => ({method: 'post', endpoint: 'client_identity', token: user1Tok, argument: null, data: {clientIdentity: {}}, expectedStatus: 400, expectedData: null, description: 'must not be able to upload a client identity in an invalid format'}),
+  () => ({method: 'post', endpoint: 'client_identity', token: user1Tok, argument: null, data: {clientIdentity: user1_id1}, expectedStatus: 200, expectedData: null, description: 'upload a client identity for user1'}),
+  () => ({method: 'post', endpoint: 'client_identity', token: user1Tok, argument: null, data: {clientIdentity: user1_id1}, expectedStatus: 409, expectedData: null, description: 'must not be able upload a client identity with already existing id'}),
+  () => ({method: 'delete', endpoint: 'session', token: user1Tok, argument: null, data: null, expectedStatus: 200, expectedData: null, description: 'logout user1'}),
+  () => ({method: 'post', endpoint: 'client_identity', token: user1Tok, argument: null, data: {clientIdentity: user1_id2}, expectedStatus: 403, expectedData: null, description: 'must not be able upload a client identity using an expired session token'}),
+  {method: 'post', endpoint: 'user_account', token: null, argument: null, data: {login: 'user2', password1: '123456789', password2: '123456789'}, expectedStatus: 200, expectedData: null, description: 'register user2'},
+  {method: 'post', endpoint: 'session', token: null, argument: null, data: {login: 'user2', password: '987654321'}, expectedStatus: 403, expectedData: null, description: 'user 2 login with wrong password'},
+  {method: 'post', endpoint: 'session', token: null, argument: null, data: {login: 'user2', password: '123456789'}, expectedStatus: 200, expectedData: null, description: 'ok login', callback: data => user2Tok = data.token},
+  () => ({method: 'post', endpoint: 'client_identity', token: user2Tok, argument: null, data: {clientIdentity: user2_id1}, expectedStatus: 200, expectedData: null, description: 'upload a client identity for user2 (same server as user1)'}),
+  {method: 'post', endpoint: 'session', token: null, argument: null, data: {login: 'user1', password: 'abcdefgh'}, expectedStatus: 200, expectedData: null, description: 'login user1 again', callback: data => user1Tok = data.token},
+  () => ({method: 'post', endpoint: 'client_identity', token: user1Tok, argument: null, data: {clientIdentity: user1_id2}, expectedStatus: 200, expectedData: null, description: 'upload another client identity for user1'}),
+  () => ({method: 'get', endpoint: 'client_identity', token: user1Tok, argument: user1_id1.server.id, data: null, expectedStatus: 200, expectedData: {clientIdentity: user1_id1}, description: 'download a client identity for user1'}),
+  () => ({method: 'get', endpoint: 'client_identity', token: user2Tok, argument: user2_id1.server.id, data: null, expectedStatus: 200, expectedData: {clientIdentity: user2_id1}, description: 'download a client identity for user2'}),
+  () => ({method: 'get', endpoint: 'client_identity', token: user1Tok, argument: null, data: null, expectedStatus: 200, expectedData: {clientIdentities: [user1_id1, user1_id2]}, description: 'download all the client identities for user1'})
 ];
 
 tap.plan(testRequests.length);
@@ -74,6 +74,8 @@ const nextTest = (i) => {
     case 'delete': req = req.delete(path); break;
     default: throw 'Unsupported method';
   }
+  if(testData.token !== null)
+    req = req.set('Session-Token', testData.token);
   if(testData.data !== null)
     req = req.send(testData.data);
   req.expect(testData.expectedStatus);

@@ -32,28 +32,28 @@ CREATE FUNCTION post_session(body JSON) RETURNS JSON AS $$
   END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE FUNCTION get_session(body JSON, urlArgument TEXT) RETURNS JSON AS $$
+CREATE FUNCTION get_session(body JSON, sessionToken UUID) RETURNS JSON AS $$
   DECLARE
     userID INT;
   BEGIN
-    userID := auth(urlArgument::UUID);
+    userID := auth(sessionToken);
     RETURN json_build_object('login', login) FROM user_account WHERE id = userID;
   END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE FUNCTION delete_session(body JSON, urlArgument TEXT) RETURNS VOID AS $$
+CREATE FUNCTION delete_session(body JSON, sessionToken UUID) RETURNS VOID AS $$
   BEGIN
-    PERFORM auth(urlArgument::UUID); --ensure session exists (transaction will be cancelled if auth() fails)
-    DELETE FROM session WHERE token = urlArgument::UUID;
+    PERFORM auth(sessionToken); --ensure session exists (transaction will be cancelled if auth() fails)
+    DELETE FROM session WHERE token = sessionToken;
   END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- client_identity
-CREATE FUNCTION get_client_identity(body JSON) RETURNS JSON AS $$
+CREATE FUNCTION get_client_identity(body JSON, sessionToken UUID) RETURNS JSON AS $$
   DECLARE
     userID INT;
   BEGIN
-    userID := auth((body->>'sessionToken')::UUID);
+    userID := auth(sessionToken);
     RETURN json_build_object('clientIdentities', COALESCE(json_agg(json_identity(CL_ID, CL_CRT, SRV_CRT)), '[]'))
       FROM client_identity CL_ID
         JOIN public_cert CL_CRT ON CL_ID.public_cert_id = CL_CRT.internal_id
@@ -62,11 +62,11 @@ CREATE FUNCTION get_client_identity(body JSON) RETURNS JSON AS $$
   END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE FUNCTION get_client_identity(body JSON, urlArgument TEXT) RETURNS JSON AS $$
+CREATE FUNCTION get_client_identity(body JSON, urlArgument TEXT, sessionToken UUID) RETURNS JSON AS $$
   DECLARE
     userID INT;
   BEGIN
-    userID := auth((body->>'sessionToken')::UUID);
+    userID := auth(sessionToken);
     RETURN json_build_object('clientIdentity', json_identity(CL_ID, CL_CRT, SRV_CRT))
       FROM client_identity CL_ID
         JOIN public_cert CL_CRT ON CL_ID.public_cert_id = CL_CRT.internal_id
@@ -75,7 +75,7 @@ CREATE FUNCTION get_client_identity(body JSON, urlArgument TEXT) RETURNS JSON AS
   END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE FUNCTION post_client_identity(body JSON) RETURNS VOID AS $$
+CREATE FUNCTION post_client_identity(body JSON, sessionToken UUID) RETURNS VOID AS $$
   DECLARE
     userID INT;
     clientIdentity JSON;
@@ -84,7 +84,7 @@ CREATE FUNCTION post_client_identity(body JSON) RETURNS VOID AS $$
     privateModulus BYTEA;
     privateExponent BYTEA;
   BEGIN
-    userID := auth((body->>'sessionToken')::UUID);
+    userID := auth(sessionToken);
     clientIdentity := body->'clientIdentity';
     privateModulus := decode((clientIdentity->'clientPrivate')->>'modulus', 'base64');
     privateExponent := decode((clientIdentity->'clientPrivate')->>'exponent', 'base64');
