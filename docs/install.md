@@ -8,16 +8,18 @@ postgres@server:~$ createuser -dPr terasologykeys_admin -U postgres
 * Enter a (strong) password when prompted. You will need this password to install the database.
 Alternatively, you can use [peer authentication](https://www.postgresql.org/docs/current/static/auth-methods.html#AUTH-PEER).
 Refer to the `createuser` [man page](https://www.postgresql.org/docs/current/static/app-createuser.html) for the correct command line options to use.
+* Then, create a database with this user as owner:
+```
+postgres@server:~$ psql -U postgres -c "CREATE DATABASE terasologykeys WITH OWNER terasologykeys_admin;"
+```
 * While you are connected as superuser, enable the `uuid-ossp` and `pgcrypto` extension on this database (it may require to install additional system packages, such as `postgresql-contrib` on Debian):
 ```
 postgres@server:~$ psql -d terasologykeys
 terasologykeys=# CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION
+terasologykeys=# CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION
 terasologykeys=# \q
-```
-* Then, create a database with this user as owner:
-```
-postgres@server:~$ psql -U postgres -c "CREATE DATABASE terasologykeys WITH OWNER terasologykeys_admin;"
 ```
 * Now, use the admin role to install the database; it's suggested you change the default password for the user which will be added:
 ```
@@ -25,15 +27,16 @@ postgres@server:~$ exit
 user@server:~$ cd terasology-key-server/sql
 user@server:~/terasology-key-server/sql$ vi 3-app-user.sql
 # edit the password now and save the file
-user@server:~/terasology-key-server/sql$ cat *.sql | psql -U terasologykeys_admin -d terasologykeys
+user@server:~/terasology-key-server/sql$ cat *.sql | PGHOST="localhost" PGPASSWORD="admin-pass" psql -U terasologykeys_admin -d terasologykeys
 ```
-You will probably be asked to enter the password you set for the `terasologykeys_admin` role. You don't need to create the limited user since the last sql file automatically generates it and assigns the correct privileges.
+(replace `admin-pass` with the password you entered when asked by `createuser`). You don't need to manually create the limited user since the last sql file automatically generates it and assigns the correct privileges.
 
 # Web application
-* If you changed the password for the limited user, edit `webapp/config.json` accordingly.
+* If you changed the password for the limited user, edit `webapp/config.json` accordingly. Alternatively, you can copy the configuration to another file, edit it, and then specify the config file when you launch the application with the `--config <file>` command line switch.
 * Then, just install the dependencies and run index.js:
 ```
 user@server:~$ cd terasology-key-server/webapp
 user@server:~/terasology-key-server/webapp$ npm install
 user@server:~/terasology-key-server/webapp$ node index.js
 ```
+* You may consider to run the application as a daemon. If your init system is systemd [this article](https://www.terlici.com/2015/06/20/running-node-forever.html) may be useful.

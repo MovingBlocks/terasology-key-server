@@ -7,7 +7,7 @@ const statusCodes = require('builtin-status-codes');
 const expressPostgresModule = require('express-postgres-sp');
 const schemaLoader = require(path.join(__dirname, 'schemaLoader'));
 
-const noToken = JSON.parse(fs.readFileSync('no-token.json'));
+const noToken = JSON.parse(fs.readFileSync(path.join(__dirname, 'no-token.json')));
 const apiPaths = ['/api/:resource', '/api/:resource/:argument'];
 
 module.exports = (dbConfig) => {
