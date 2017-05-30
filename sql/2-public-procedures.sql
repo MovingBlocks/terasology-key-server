@@ -17,7 +17,7 @@ CREATE FUNCTION post_user_account(body JSON) RETURNS VOID AS $$
         'Thank you for registering on this Terasology identity storage server!' || E'\n\n' ||
         'The code to verify your account is: ' || confTok || E'\n\n' ||
         'Paste this in the web page you used for registration to activate your account.' || E'\n' ||
-        'NOTE: if an account is not verified in 24 hours after the registration form submission, it is deleted.');
+        'NOTE: if an account is not verified in 2 hours after the registration form submission, it is deleted.');
     END IF;
     INSERT INTO user_account (login, password, email, confirmToken) VALUES (body->>'login', crypt(body->>'password1', gen_salt('bf', 8)), body->>'email', confTok);
   EXCEPTION
@@ -29,9 +29,10 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE FUNCTION patch_user_account(body JSON) RETURNS VOID AS $$
   BEGIN
-    UPDATE user_account SET confirmToken = NULL WHERE confirmToken = (body->>'confirmToken')::UUID AND NOT requestedPasswordReset;
+    UPDATE user_account SET confirmToken = NULL WHERE confirmToken = (body->>'confirmToken')::UUID
+      AND NOT requestedPasswordReset AND account_verification_timestamp_valid(confirmTokenTimestamp);
     IF NOT FOUND THEN
-      PERFORM raiseCustomException(403, 'The specified confirmation token is not valid.');
+      PERFORM raiseCustomException(403, 'The specified confirmation token is not valid or has expired.');
     END IF;
   END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

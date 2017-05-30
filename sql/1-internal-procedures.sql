@@ -6,13 +6,22 @@ CREATE FUNCTION raiseCustomException(httpStatus INT, message TEXT) RETURNS VOID 
   END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION session_timestamp_valid(t TIMESTAMP) RETURNS BOOLEAN AS $$
-  SELECT CURRENT_TIMESTAMP - t < '12 hours'::INTERVAL;
+CREATE FUNCTION timestamp_valid(t TIMESTAMP, validity INTERVAL) RETURNS BOOLEAN AS $$
+  SELECT CURRENT_TIMESTAMP - t < validity;
 $$ LANGUAGE sql;
 
-CREATE FUNCTION clean_expired_sessions() RETURNS VOID AS $$
+CREATE FUNCTION session_timestamp_valid(t TIMESTAMP) RETURNS BOOLEAN AS $$
+  SELECT timestamp_valid(t, '24 hours'::INTERVAL)
+$$ LANGUAGE sql;
+
+CREATE FUNCTION account_verification_timestamp_valid(t TIMESTAMP) RETURNS BOOLEAN AS $$
+  SELECT timestamp_valid(t, '2 hours'::INTERVAL)
+$$ LANGUAGE sql;
+
+CREATE FUNCTION cleanup_expired_tokens() RETURNS VOID AS $$
   DELETE FROM session WHERE NOT session_timestamp_valid(login_timestamp);
-$$ LANGUAGE sql; --TODO SECURITY DEFINER
+  DELETE FROM user_account WHERE confirmToken IS NOT NULL AND NOT requestedPasswordReset AND NOT account_verification_timestamp_valid(confirmTokenTimestamp);
+$$ LANGUAGE sql SECURITY DEFINER;
 
 CREATE FUNCTION auth(sessionToken UUID) RETURNS INT AS $$
   DECLARE

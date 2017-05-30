@@ -12,6 +12,7 @@ CREATE TABLE user_account(
   email TEXT,
   confirmToken UUID UNIQUE,
   requestedPasswordReset BOOLEAN NOT NULL DEFAULT FALSE,
+  confirmTokenTimestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, --can be the timestamp of the registration, or of the latest password reset request
   CHECK(login ~ '^[A-Za-z0-9_]{4,40}$'),
   CHECK(email IS NULL OR email ~ '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$')
 );
