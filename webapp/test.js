@@ -16,6 +16,9 @@ console.log('Loaded schemas: ' + schemaList);
 const user1_id1 = {"server": {"id": "ce49c253-1065-4dc0-a11b-fc06f16379ef","modulus": "YWJj","exponent": "ZGVm","signature": "Z2hp"},
       "clientPublic": {"id": "d2c8637a-7416-47f5-badb-5b77dba50e68", "modulus": "MTIz","exponent": "NDU2","signature": "Nzg5"},
       "clientPrivate": {"modulus": "cHJ2MQ==", "exponent": "cHJ2Mg=="}};
+const user1_id1_new = {"server": {"id": "ce49c253-1065-4dc0-a11b-fc06f16379ef","modulus": "YWJj","exponent": "ZGVm","signature": "Z2hp"},
+      "clientPublic": {"id": "bc32a32f-e977-4351-90ee-1a470135917d", "modulus": "MzIx","exponent": "NjU0","signature": "OTg3"},
+      "clientPrivate": {"modulus": "cHJ2QQ==", "exponent": "cHJ2Qg=="}};
 const user1_id2 = {"server": {"id": "74c2c0c4-851c-4e95-9690-13e1fb3c0eac","modulus": "MzMz","exponent": "MjIy","signature": "MTEx"},
       "clientPublic": {"id": "9d355883-ee55-435e-8f0f-13829e83958d","modulus": "YWFh","exponent": "YmJi","signature": "Y2Nj"},
       "clientPrivate": {"modulus": "cHJ2Mw==","exponent": "cHJ2NA=="}};
@@ -40,7 +43,7 @@ const testRequests = [
   () => ({method: 'post', endpoint: 'client_identity', token: null, argument: null, data: {clientIdentity: user1_id1}, expectedStatus: 403, expectedData: null, description: 'must not be able to upload a client identity without a session token'}),
   () => ({method: 'post', endpoint: 'client_identity', token: user1Tok, argument: null, data: {clientIdentity: {}}, expectedStatus: 400, expectedData: null, description: 'must not be able to upload a client identity in an invalid format'}),
   () => ({method: 'post', endpoint: 'client_identity', token: user1Tok, argument: null, data: {clientIdentity: user1_id1}, expectedStatus: 200, expectedData: null, description: 'upload a client identity for user1'}),
-  () => ({method: 'post', endpoint: 'client_identity', token: user1Tok, argument: null, data: {clientIdentity: user1_id1}, expectedStatus: 409, expectedData: null, description: 'must not be able upload a client identity with already existing id'}),
+  () => ({method: 'post', endpoint: 'client_identity', token: user1Tok, argument: null, data: {clientIdentity: user1_id1_new}, expectedStatus: 200, expectedData: null, description: 'replace a client identity for user1'}),
   () => ({method: 'delete', endpoint: 'session', token: user1Tok, argument: null, data: null, expectedStatus: 200, expectedData: null, description: 'logout user1'}),
   () => ({method: 'post', endpoint: 'client_identity', token: user1Tok, argument: null, data: {clientIdentity: user1_id2}, expectedStatus: 403, expectedData: null, description: 'must not be able upload a client identity using an expired session token'}),
   {method: 'post', endpoint: 'user_account', token: null, argument: null, data: {login: 'user2', password1: '123456789', password2: '123456789'}, expectedStatus: 200, expectedData: null, description: 'register user2'},
@@ -49,9 +52,9 @@ const testRequests = [
   () => ({method: 'post', endpoint: 'client_identity', token: user2Tok, argument: null, data: {clientIdentity: user2_id1}, expectedStatus: 200, expectedData: null, description: 'upload a client identity for user2 (same server as user1)'}),
   {method: 'post', endpoint: 'session', token: null, argument: null, data: {login: 'user1', password: 'abcdefgh'}, expectedStatus: 200, expectedData: null, description: 'login user1 again', callback: data => user1Tok = data.token},
   () => ({method: 'post', endpoint: 'client_identity', token: user1Tok, argument: null, data: {clientIdentity: user1_id2}, expectedStatus: 200, expectedData: null, description: 'upload another client identity for user1'}),
-  () => ({method: 'get', endpoint: 'client_identity', token: user1Tok, argument: user1_id1.server.id, data: null, expectedStatus: 200, expectedData: {clientIdentity: user1_id1}, description: 'download a client identity for user1'}),
+  () => ({method: 'get', endpoint: 'client_identity', token: user1Tok, argument: user1_id1.server.id, data: null, expectedStatus: 200, expectedData: {clientIdentity: user1_id1_new}, description: 'download a client identity for user1'}),
   () => ({method: 'get', endpoint: 'client_identity', token: user2Tok, argument: user2_id1.server.id, data: null, expectedStatus: 200, expectedData: {clientIdentity: user2_id1}, description: 'download a client identity for user2'}),
-  () => ({method: 'get', endpoint: 'client_identity', token: user1Tok, argument: null, data: null, expectedStatus: 200, expectedData: {clientIdentities: [user1_id1, user1_id2]}, description: 'download all the client identities for user1'})
+  () => ({method: 'get', endpoint: 'client_identity', token: user1Tok, argument: null, data: null, expectedStatus: 200, expectedData: {clientIdentities: [user1_id1_new, user1_id2]}, description: 'download all the client identities for user1'})
 ];
 
 tap.plan(testRequests.length);

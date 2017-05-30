@@ -31,5 +31,6 @@ CREATE TABLE client_identity (
   public_cert_id INT PRIMARY KEY REFERENCES public_cert(internal_id) ON UPDATE CASCADE ON DELETE NO ACTION,
   server_public_cert_id INT NOT NULL REFERENCES public_cert(internal_id) ON UPDATE CASCADE ON DELETE NO ACTION,
   private_cert_modulus BYTEA NOT NULL,
-  private_cert_exponent BYTEA NOT NULL
+  private_cert_exponent BYTEA NOT NULL,
+  UNIQUE(user_account_id, server_public_cert_id)
 );

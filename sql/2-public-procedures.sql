@@ -86,16 +86,20 @@ CREATE FUNCTION post_client_identity(body JSON, sessionToken UUID) RETURNS VOID 
   BEGIN
     userID := auth(sessionToken);
     clientIdentity := body->'clientIdentity';
+    SELECT internal_id INTO serverCertId FROM public_cert WHERE id = ((clientIdentity->'server')->>'id')::UUID;
+    IF FOUND THEN --if already exists, then replace/overwrite
+      SELECT public_cert_id INTO clientCertId FROM client_identity WHERE user_account_id = userID AND server_public_cert_id = serverCertId;
+      DELETE FROM client_identity WHERE user_account_id = userID AND server_public_cert_id = serverCertId;
+      DELETE FROM public_cert WHERE internal_id = clientCertId;
+    END IF;
+    clientCertId := insert_public_cert(clientIdentity->'clientPublic');
     privateModulus := decode((clientIdentity->'clientPrivate')->>'modulus', 'base64');
     privateExponent := decode((clientIdentity->'clientPrivate')->>'exponent', 'base64');
-    clientCertId := insert_public_cert(clientIdentity->'clientPublic');
     SELECT internal_id INTO serverCertId FROM public_cert WHERE id = ((clientIdentity->'server')->>'id')::UUID;
     IF NOT FOUND THEN
       serverCertId := insert_public_cert(clientIdentity->'server');
     END IF;
     INSERT INTO client_identity(user_account_id, public_cert_id, server_public_cert_id, private_cert_modulus, private_cert_exponent)
       VALUES (userID, clientCertID, serverCertId, privateModulus, privateExponent);
-    EXCEPTION
-      WHEN unique_violation THEN PERFORM raiseCustomException(409, 'A client identity certificate with the same ID already exists.');
   END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
