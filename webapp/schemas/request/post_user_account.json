@@ -5,7 +5,8 @@
   "properties": {
     "login": {"type": "string"},
     "password1": {"type": "string"},
-    "password2": {"type": "string"}
+    "password2": {"type": "string"},
+    "email": {"type": ["string", "null"]}
   },
   "required": ["login", "password1", "password2"],
   "additionalProperties": false

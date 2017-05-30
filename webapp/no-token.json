@@ -1,4 +1,5 @@
 [
   {"method": "post", "resource": "user_account"},
+  {"method": "patch", "resource": "user_account"},
   {"method": "post", "resource": "session"}
 ]

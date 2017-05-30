@@ -37,20 +37,45 @@
     crossorigin="anonymous"></script>
   <script>
     $(document).ready(function(){
-      $(".form-horizontal").submit(function(){
+      function nullIfEmpty(str){
+        return str ? str : null;
+      }
+      $("#registrationForm").submit(function(){
         $("#regBtn").prop("disabled", true);
         $.post({
           url: "/api/user_account",
-          data: JSON.stringify({login: $("#username").val(), password1: $("#password").val(), password2: $("#confirm").val()}),
+          data: JSON.stringify({login: $("#username").val(), password1: $("#password").val(), password2: $("#confirm").val(), email: nullIfEmpty($("#email").val())}),
           contentType: "application/json",
           success: function(res){
-            $(".form-horizontal").hide();
-            $("#okAlert").removeClass("hidden");
+            $("#registerTab").hide();
+            if($("#email").val())
+              $("#accountConfirmTab").removeClass("hidden");
+            else
+              $("#okAlert").removeClass("hidden");
           },
           error: function(res){
             $("#errAlert").text(res.responseJSON.error);
             $("#errAlert").removeClass("hidden");
             $("#regBtn").prop("disabled", false);
+          }
+        });
+        return false;
+      });
+      $("#confirmationForm").submit(function(){
+        $("#confirmationBtn").prop("disabled", true);
+        $.ajax({
+          method: "PATCH",
+          url: "/api/user_account",
+          data: JSON.stringify({confirmToken: $("#confirmToken").val()}),
+          contentType: "application/json",
+          success: function(res){
+            $("#accountConfirmTab").hide();
+            $("#okAlert").removeClass("hidden");
+          },
+          error: function(res){
+            $("#confirmErrAlert").text(res.responseJSON.error);
+            $("#confirmErrAlert").removeClass("hidden");
+            $("#confirmationBtn").prop("disabled", false);
           }
         });
         return false;
@@ -76,12 +101,18 @@
         (or accidentally delete the client's data folder), you can enter the same credentials again and the client will download your identity certificates, so the game servers you join will in turn recognize you.
       </div>
       <br />
-      <div class="main-login main-center">
-        <form class="form-horizontal" method="post" action="#">
+
+      <div class="main-login main-center" id="registerTab">
+        <form id="registrationForm" class="form-horizontal" method="post" action="#">
 
           <div class="form-group">
             <label for="username" class="cols-sm-2 control-label">Login name</label>
             <input type="text" class="form-control" name="username" id="username"  placeholder="The name you want to use to login"/>
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="cols-sm-2 control-label">Email</label>
+            <input type="text" class="form-control" name="username" id="email"  placeholder="A valid address where you can receive email"/>
           </div>
 
           <div class="form-group">
@@ -94,17 +125,36 @@
             <input type="password" class="form-control" name="confirm" id="confirm"  placeholder="Confirm your password"/>
           </div>
 
+          <div class="form-group alert alert-info"><b>Notice:</b>Email is not mandatory, but if you don't set it you won't be able to recover the password if you forget it!</div>
+          <div class="form-group alert alert-danger hidden" id="errAlert"></div>
+
           <div class="form-group">
             <button id="regBtn" type="submit" class="btn btn-primary btn-lg btn-block">Register</button>
           </div>
-
-          <div class="form-group alert alert-danger hidden" id="errAlert"></div>
         </form>
-        <div class="form-group alert alert-success hidden" id="okAlert">
-          Registration completed succesfully!<br />
-          You can now go in the game client and login with the credentials you just registered.
-        </div>
       </div>
+
+      <div class="main-login main-center hidden" id="accountConfirmTab">
+        <form id="confirmationForm" class="form-horizontal" method="post" action="#">
+
+          <div class="form-group">
+            <label for="username" class="cols-sm-2 control-label">Verification token</label>
+            <input type="text" class="form-control" name="username" id="confirmToken"  placeholder="The token you received in the welcome email"/>
+          </div>
+
+          <div class="form-group alert alert-danger hidden" id="confirmErrAlert"></div>
+
+          <div class="form-group">
+            <button id="confirmationBtn" type="submit" class="btn btn-primary btn-lg btn-block">Confirm account</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="form-group alert alert-success hidden" id="okAlert">
+        Registration completed succesfully!<br />
+        You can now go in the game client and login with the credentials you just registered.
+      </div>
+
     </div>
   </div>
 </body>

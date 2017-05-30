@@ -9,7 +9,11 @@ CREATE TABLE user_account(
   id SERIAL PRIMARY KEY,
   login VARCHAR(40) NOT NULL UNIQUE,
   password TEXT NOT NULL,
-  CHECK(login ~ '^[A-Za-z0-9_]{4,40}$')
+  email TEXT,
+  confirmToken UUID UNIQUE,
+  requestedPasswordReset BOOLEAN NOT NULL DEFAULT FALSE,
+  CHECK(login ~ '^[A-Za-z0-9_]{4,40}$'),
+  CHECK(email IS NULL OR email ~ '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$')
 );
 
 CREATE TABLE session (

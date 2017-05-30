@@ -2,6 +2,7 @@
 
 ## /api/user_account
 - [x] POST: register a new user.
+- [x] PATCH: confirm the account. This must be called to enable the account if an email was specified in the registration, specifying the session token received in the email.
 
 ## /api/session
 - [x] POST: given username and password, creates a new session (login with a new client); returns a session token.
