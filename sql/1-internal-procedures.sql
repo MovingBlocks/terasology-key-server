@@ -68,3 +68,11 @@ CREATE FUNCTION insert_public_cert(cert JSON) RETURNS INT AS $$
     decode(cert->>'signature', 'base64')
     ) RETURNING internal_id AS result;
 $$ LANGUAGE sql;
+
+CREATE FUNCTION assertUrl(actual TEXT, expected TEXT) RETURNS VOID AS $$
+  BEGIN
+    IF actual <> expected THEN
+      PERFORM raiseCustomException(404, 'Not Found');
+    END IF;
+  END;
+$$ LANGUAGE plpgsql;

@@ -4,6 +4,10 @@
 - [x] POST: register a new user.
 - [x] PATCH: confirm the account. This must be called to enable the account if an email was specified in the registration, specifying the session token received in the email.
 
+### /api/user_account/passwordReset
+- [x] POST: create a new password reset request. Requires login name and email.
+- [x] DELETE: finalize the password reset. Requires the token sent to the mailbox.
+
 ## /api/session
 - [x] POST: given username and password, creates a new session (login with a new client); returns a session token.
 

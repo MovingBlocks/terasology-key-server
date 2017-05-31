@@ -37,6 +37,40 @@ CREATE FUNCTION patch_user_account(body JSON) RETURNS VOID AS $$
   END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- user_account/passwordReset
+CREATE FUNCTION post_user_account(body JSON, urlArgument TEXT) RETURNS VOID AS $$
+  DECLARE
+    token UUID;
+  BEGIN
+    PERFORM assertUrl(urlArgument, 'passwordReset');
+    token := public.uuid_generate_v4();
+    UPDATE user_account SET confirmToken = token, confirmTokenTimestamp = CURRENT_TIMESTAMP, requestedPasswordReset = TRUE
+      WHERE email = (body->>'email') AND login = (body->>'login') AND confirmToken IS NULL AND NOT requestedPasswordReset;
+    IF NOT FOUND THEN
+      PERFORM raiseCustomException(403, 'The specified account does not exists, has not been activated or alreasy requested a password reset.');
+    END IF;
+    PERFORM public.pgmail('Terasology Identity Storage Service <noreply@localhost>', 'User <'||(body->>'email')||'>', 'Reset your password',
+      'You requested to reset your account''s password on this Terasology identity storage server.' || E'\n\n' ||
+      'The code to reset your password is: ' || token || E'\n\n' ||
+      'Paste this in the web page you used to request the password reset to actually change your password.' || E'\n' ||
+      'NOTE: if the password reset is not completed in 2 hours after the request form submission, the code is invalidated and you have to request a new one.');
+  END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE FUNCTION delete_user_account(body JSON, urlArgument TEXT) RETURNS VOID AS $$
+  BEGIN
+    PERFORM assertUrl(urlArgument, 'passwordReset');
+    IF (body->>'password1') <> (body->>'password2') THEN
+      PERFORM raiseCustomException(400, 'Entered passwords do not match');
+    END IF;
+    UPDATE user_account SET password = crypt(body->>'password1', gen_salt('bf', 8)), confirmToken = NULL, requestedPasswordReset = FALSE
+      WHERE confirmToken = (body->>'confirmToken')::UUID AND requestedPasswordReset AND account_verification_timestamp_valid(confirmTokenTimestamp);
+    IF NOT FOUND THEN
+      PERFORM raiseCustomException(403, 'The specified password reset token is not valid or has expired.');
+    END IF;
+  END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- session
 CREATE FUNCTION post_session(body JSON) RETURNS JSON AS $$
   DECLARE

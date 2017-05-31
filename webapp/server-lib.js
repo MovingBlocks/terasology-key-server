@@ -34,16 +34,23 @@ module.exports = (dbConfig) => {
   //Request payload validation
   app.all(apiPaths, (req, res, next) => {
     const baseSchemaName = 'request_' + req.method.toLowerCase() + '_' + req.params.resource;
+    const argumentSpecificSchemaName = baseSchemaName + (req.params.argument === undefined ? '_0' : '_1');
     if(schemaList.indexOf(baseSchemaName) > -1){
       if(ajv.validate(baseSchemaName, req.body))
         next();
       else
         res.status(400).json({error: 'JSON data validation against schema ' + baseSchemaName + ' failed'});
-    }else
+    }else if(schemaList.indexOf(argumentSpecificSchemaName) > -1){
+      if(ajv.validate(argumentSpecificSchemaName, req.body))
+        next();
+      else
+        res.status(400).json({error: 'JSON data validation against schema ' + argumentSpecificSchemaName + ' failed'});
+    }else{
       if(Object.keys(req.body).length === 0)
         next();
       else
         res.status(400).json({error: 'Request to the specified endpoint with the specified method must not send any payload'});
+    }
   });
 
   //DBMS query

@@ -19,6 +19,8 @@ REVOKE ALL ON ALL FUNCTIONS IN SCHEMA terasologykeys FROM terasologykeys_app;
 
 GRANT EXECUTE ON FUNCTION post_user_account(JSON) TO terasologykeys_app;
 GRANT EXECUTE ON FUNCTION patch_user_account(JSON) TO terasologykeys_app;
+GRANT EXECUTE ON FUNCTION post_user_account(JSON, TEXT) TO terasologykeys_app;
+GRANT EXECUTE ON FUNCTION delete_user_account(JSON, TEXT) TO terasologykeys_app;
 GRANT EXECUTE ON FUNCTION post_session(JSON) TO terasologykeys_app;
 GRANT EXECUTE ON FUNCTION get_session(JSON, UUID) TO terasologykeys_app;
 GRANT EXECUTE ON FUNCTION delete_session(JSON, UUID) TO terasologykeys_app;
