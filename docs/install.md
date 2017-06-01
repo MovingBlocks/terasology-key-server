@@ -1,5 +1,6 @@
 # Database installation
 Two rolse/users are created, one is the administrator of the database and is used to create the tables and stored procedures (to avoid using the root user), the other one will be used by the web application and will only have access to selected stored procedures (no direct access to the data).
+* Install the following PostgreSQL extensions: [pgmail](https://github.com/captbrando/pgMail) and [pgsql-http](https://github.com/pramsey/pgsql-http). refer to their READMEs for more detailed instructions.
 * Using the root user, create the "admin" role:
 ```
 user@server:~$ su - postgres
@@ -12,15 +13,7 @@ Refer to the `createuser` [man page](https://www.postgresql.org/docs/current/sta
 ```
 postgres@server:~$ psql -U postgres -c "CREATE DATABASE terasologykeys WITH OWNER terasologykeys_admin;"
 ```
-* While you are connected as superuser, enable the `uuid-ossp` and `pgcrypto` extension on this database (it may require to install additional system packages, such as `postgresql-contrib` on Debian):
-```
-postgres@server:~$ psql -d terasologykeys
-terasologykeys=# CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION
-terasologykeys=# CREATE EXTENSION IF NOT EXISTS pgcrypto;
-CREATE EXTENSION
-terasologykeys=# \q
-```
+* While you are connected as superuser, enable the previously installed extensions in the new database, plus `uuid-ossp` and `pgcrypto` extension on this database (this may require to install additional system packages, such as `postgresql-contrib` on Debian).
 * Now, use the admin role to install the database; it's suggested you change the default password for the user which will be added:
 ```
 postgres@server:~$ exit

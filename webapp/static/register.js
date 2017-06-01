@@ -9,3 +9,7 @@ $(document).ready(function(){
     $("#okAlert").removeClass("hidden");
   });
 });
+
+function recaptchaCallback(answer) {
+  $('#recaptchaAnswer').val(answer);
+}

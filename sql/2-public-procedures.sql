@@ -7,6 +7,7 @@ CREATE FUNCTION post_user_account(body JSON) RETURNS VOID AS $$
     email TEXT;
   BEGIN
     PERFORM validatePassword(body->>'password1', body->>'password2');
+    PERFORM checkRecaptcha(body->>'recaptchaAnswer');
     IF (body->>'email') IS NOT NULL AND (body->>'email') <> '' THEN
       email = body->>'email';
       confTok := public.uuid_generate_v4();

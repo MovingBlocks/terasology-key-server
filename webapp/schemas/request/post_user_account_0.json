@@ -6,7 +6,8 @@
     "login": {"type": "string"},
     "password1": {"type": "string"},
     "password2": {"type": "string"},
-    "email": {"type": ["string", "null"]}
+    "email": {"type": ["string", "null"]},
+    "recaptchaAnswer": {"type": "string"}
   },
   "required": ["login", "password1", "password2"],
   "additionalProperties": false

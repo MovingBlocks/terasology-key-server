@@ -4,10 +4,11 @@ language: node_js
 node_js:
   - "7"
 install:
-  - sudo apt-get install python-setuptools postgresql-server-dev-9.6 postgresql-contrib
+  - sudo apt-get install python-setuptools postgresql-server-dev-9.6 postgresql-contrib libcurl4-openssl-dev
   - sudo easy_install pgxnclient
   - sudo pgxn install pgtap
   - sudo PERL_MM_USE_DEFAULT=1 cpan TAP::Parser::SourceHandler::pgTAP
+  - git clone https://github.com/pramsey/pgsql-http.git && cd pgsql-http && make && sudo make install && cd ..
   - npm install -g ajv-cli
   - cd webapp && npm install && cd ..
 addons:
@@ -18,6 +19,7 @@ before_script:
   - psql -U postgres -c "CREATE DATABASE terasologykeys;"
   - psql -U postgres -d terasologykeys -c "CREATE EXTENSION pgcrypto;"
   - psql -U postgres -d terasologykeys -c "CREATE EXTENSION \"uuid-ossp\";"
+  - psql -U postgres -d terasologykeys -c "CREATE EXTENSION http;"
   - psql -U postgres -d terasologykeys -c "CREATE EXTENSION pgtap;"
 script:
   # install database (test SQL syntax)
