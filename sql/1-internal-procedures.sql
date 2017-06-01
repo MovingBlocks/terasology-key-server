@@ -76,3 +76,14 @@ CREATE FUNCTION assertUrl(actual TEXT, expected TEXT) RETURNS VOID AS $$
     END IF;
   END;
 $$ LANGUAGE plpgsql;
+
+CREATE FUNCTION validatePassword(password1 TEXT, password2 TEXT) RETURNS VOID AS $$
+  BEGIN
+    IF password1 <> password2 THEN
+      PERFORM raiseCustomException(400, 'Entered passwords do not match');
+    END IF;
+    IF length(password1) < 8 THEN
+      PERFORM raiseCustomException(400, 'The password must be at least 8 characters long.');
+    END IF;
+  END;
+$$ LANGUAGE plpgsql;
