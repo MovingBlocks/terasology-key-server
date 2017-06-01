@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!--
+Parts of the code in this file are adapted from the following template:
+https://bootsnipp.com/snippets/featured/register-page
+Licensed under the MIT license as specified here:
+https://bootsnipp.com/license
+-->
+<html>
+<head>
+  <link
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+  rel="stylesheet"
+  integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+  crossorigin="anonymous">
+  <link href="style.css" rel="stylesheet">
+  <script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+  <script src="/static/vendor/jquery.serialize-object.min.js"></script>
+  <script src="/static/common.js"></script>
+  <script src="/static/register.js"></script>
+  <title>Terasology client identity storage service</title>
+</head>
+<body>
+  <div class="container">
+    <div class="row main">
+      <div class="panel-heading">
+        <div class="panel-title text-center">
+          <h1 class="title">Terasology client identity storage service</h1>
+          <h3>Register a new account</h3>
+          <hr />
+        </div>
+      </div>
+      <div class="text-justify">
+        This server is running a <a href="http://forum.terasology.org/threads/client-identity-cloud-storage-service.1846">client identity storage service</a> for <a href="http://terasology.org">Terasology</a>.<br /><br />
+        On this page, you can register an account which allows you to sync your identity on every game server you play on across your game clients.
+        Once you registered an account, you can enter your credentials in the game to upload your client identity certificates and keep them syncronized with this service; if you later want to play on another computer
+        (or accidentally delete the client's data folder), you can enter the same credentials again and the client will download your identity certificates, so the game servers you join will in turn recognize you.
+      </div>
+      <br />
+
+      <form id="registrationForm" class="form-horizontal" method="post" action="#">
+
+        <div class="form-group">
+          <label for="login" class="cols-sm-2 control-label">Login name</label>
+          <input type="text" class="form-control" name="login" id="login"  placeholder="The name you want to use to login"/>
+        </div>
+
+        <div class="form-group">
+          <label for="email" class="cols-sm-2 control-label">Email</label>
+          <input type="text" class="form-control" name="email" id="email"  placeholder="A valid address where you can receive email"/>
+        </div>
+
+        <div class="form-group">
+          <label for="password1" class="cols-sm-2 control-label">Password</label>
+          <input type="password" class="form-control" name="password1" id="password1"  placeholder="Enter a password"/>
+        </div>
+
+        <div class="form-group">
+          <label for="password2" class="cols-sm-2 control-label">Confirm Password</label>
+          <input type="password" class="form-control" name="password2" id="password2"  placeholder="Confirm your password"/>
+        </div>
+
+        <div class="form-group alert alert-info"><b>Notice:</b>Email is not mandatory, but if you don't set it you won't be able to recover the password if you forget it!</div>
+        <div class="errAlert form-group alert alert-danger hidden"></div>
+
+        <div class="form-group">
+          <button type="submit" class="submitBtn btn btn-primary btn-lg btn-block">Register</button>
+        </div>
+      </form>
+
+      <form id="confirmationForm" class="hidden form-horizontal" method="post" action="#">
+
+        <div>
+          You specified an email address in the registration form. Please paste here the token just sent to your mailbox to activate your account.
+        </div>
+
+        <div class="form-group">
+          <label for="confirmToken" class="cols-sm-2 control-label">Verification token</label>
+          <input type="text" class="form-control" name="confirmToken" id="confirmToken"  placeholder="The token you received in the welcome email"/>
+        </div>
+
+        <div class="errAlert form-group alert alert-danger hidden"></div>
+
+        <div class="form-group">
+          <button type="submit" class="submitBtn btn btn-primary btn-lg btn-block">Confirm account</button>
+        </div>
+      </form>
+
+      <div class="form-group alert alert-success hidden" id="okAlert">
+        Registration completed succesfully!<br />
+        You can now go in the game client and login with the credentials you just registered.
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

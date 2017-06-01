@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const app = require('express')();
+const express = require('express');
+const app = express();
 const ajv = require('ajv')({allErrors: true});
 const bodyParser = require('body-parser');
 const statusCodes = require('builtin-status-codes');
@@ -82,8 +83,9 @@ module.exports = (dbConfig) => {
     }
   });
 
-  //serve the simple HTML registration page
-  app.get('/', (req, res) => res.sendFile(path.join(__dirname, '/static/web-ui.html')));
+  //serve the frontend
+  app.use('/static', express.static(path.join(__dirname, 'static')));
+  app.get('/', (req, res) => res.redirect('/static/register.html'));
 
   return app;
 };

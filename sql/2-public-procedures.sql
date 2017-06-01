@@ -4,6 +4,7 @@
 CREATE FUNCTION post_user_account(body JSON) RETURNS VOID AS $$
   DECLARE
     confTok UUID;
+    email TEXT;
   BEGIN
     IF (body->>'password1') <> (body->>'password2') THEN
       PERFORM raiseCustomException(400, 'Entered passwords do not match');
@@ -11,15 +12,18 @@ CREATE FUNCTION post_user_account(body JSON) RETURNS VOID AS $$
     IF length(body->>'password1') < 8 THEN
       PERFORM raiseCustomException(400, 'The password must be at least 8 characters long.');
     END IF;
-    IF (body->>'email') IS NOT NULL THEN
+    IF (body->>'email') IS NOT NULL AND (body->>'email') <> '' THEN
+      email = body->>'email';
       confTok := public.uuid_generate_v4();
+    END IF;
+    INSERT INTO user_account (login, password, email, confirmToken) VALUES (body->>'login', crypt(body->>'password1', gen_salt('bf', 8)), email, confTok);
+    IF email IS NOT NULL THEN
       PERFORM public.pgmail('Terasology Identity Storage Service <noreply@localhost>', 'User <'||(body->>'email')||'>', 'Confirm account registration',
         'Thank you for registering on this Terasology identity storage server!' || E'\n\n' ||
         'The code to verify your account is: ' || confTok || E'\n\n' ||
         'Paste this in the web page you used for registration to activate your account.' || E'\n' ||
         'NOTE: if an account is not verified in 2 hours after the registration form submission, it is deleted.');
     END IF;
-    INSERT INTO user_account (login, password, email, confirmToken) VALUES (body->>'login', crypt(body->>'password1', gen_salt('bf', 8)), body->>'email', confTok);
   EXCEPTION
       WHEN unique_violation THEN PERFORM raiseCustomException(409, 'The specified username is not available.');
       WHEN check_violation OR string_data_right_truncation THEN
