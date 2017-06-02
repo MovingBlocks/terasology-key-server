@@ -1,6 +1,12 @@
+# Preparation
+* Obtain a pair of reCAPTCHA site and secret keys (see [here](http://www.google.com/recaptcha/admin)).
+* Replace the test keys with your keys:
+  * The site key goes in the `data-sitekey` attribute of the `div` element at line 63 of `webapp/static/register.html`.
+  * The secret key goes at the `serial` parameter on line 103 of `sql/1-internal-procedures.sql`.
+
 # Database installation
-Two rolse/users are created, one is the administrator of the database and is used to create the tables and stored procedures (to avoid using the root user), the other one will be used by the web application and will only have access to selected stored procedures (no direct access to the data).
-* Install the following PostgreSQL extensions: [pgmail](https://github.com/captbrando/pgMail) and [pgsql-http](https://github.com/pramsey/pgsql-http). refer to their READMEs for more detailed instructions.
+Two roles/users are created, one is the administrator of the database and is used to create the tables and stored procedures (to avoid using the root user), the other one will be used by the web application and will only have access to selected stored procedures (no direct access to the data).
+* Install the following PostgreSQL extensions: [pgmail](https://github.com/captbrando/pgMail) and [pgsql-http](https://github.com/pramsey/pgsql-http); refer to their READMEs for more detailed instructions. When configuring pgmail, you will need to specify an SMTP server; you could install a local one using [postfix](http://www.postfix.org/).
 * Using the root user, create the "admin" role:
 ```
 user@server:~$ su - postgres

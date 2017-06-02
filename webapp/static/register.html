@@ -44,33 +44,40 @@ https://bootsnipp.com/license
 
       <form id="registrationForm" class="form-horizontal" method="post" action="#">
 
-        <div class="form-group">
-          <label for="login" class="cols-sm-2 control-label">Login name</label>
-          <input type="text" class="form-control" name="login" id="login"  placeholder="The name you want to use to login"/>
-        </div>
-
-        <div class="form-group">
-          <label for="email" class="cols-sm-2 control-label">Email</label>
-          <input type="text" class="form-control" name="email" id="email"  placeholder="A valid address where you can receive email"/>
-        </div>
-
-        <div class="form-group">
-          <label for="password1" class="cols-sm-2 control-label">Password</label>
-          <input type="password" class="form-control" name="password1" id="password1"  placeholder="Enter a password"/>
-        </div>
-
-        <div class="form-group">
-          <label for="password2" class="cols-sm-2 control-label">Confirm Password</label>
-          <input type="password" class="form-control" name="password2" id="password2"  placeholder="Confirm your password"/>
-        </div>
-
-        <input type="hidden" id="recaptchaAnswer" name="recaptchaAnswer" value=""/>
-        <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" data-callback="recaptchaCallback"></div>
         <div class="form-group alert alert-info"><b>Notice:</b>Email is not mandatory, but if you don't set it you won't be able to recover the password if you forget it!</div>
         <div class="errAlert form-group alert alert-danger hidden"></div>
+        <input type="hidden" id="recaptchaAnswer" name="recaptchaAnswer" value=""/>
 
-        <div class="form-group">
-          <button type="submit" class="submitBtn btn btn-primary btn-lg btn-block">Register</button>
+        <div class="col-md-6">
+          <div class="form-group smallspacing">
+            <label for="login" class="cols-sm-2 control-label">Login name</label>
+            <input type="text" class="form-control" name="login" id="login"  placeholder="The name you want to use to login"/>
+          </div>
+
+          <div class="form-group smallspacing">
+            <label for="email" class="cols-sm-2 control-label">Email</label>
+            <input type="text" class="form-control" name="email" id="email"  placeholder="A valid address where you can receive email"/>
+          </div>
+
+          <div class="form-group smallspacing">
+            <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" data-callback="recaptchaCallback"></div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-group smallspacing">
+            <label for="password1" class="cols-sm-2 control-label">Password</label>
+            <input type="password" class="form-control" name="password1" id="password1"  placeholder="Enter a password"/>
+          </div>
+
+          <div class="form-group smallspacing">
+            <label for="password2" class="cols-sm-2 control-label">Confirm Password</label>
+            <input type="password" class="form-control" name="password2" id="password2"  placeholder="Confirm your password"/>
+          </div>
+
+          <div class="form-group smallspacing">
+            <button type="submit" class="submitBtn btn btn-primary btn-lg btn-block">Register</button>
+          </div>
         </div>
       </form>
 
