@@ -29,6 +29,7 @@ user@server:~/terasology-key-server/sql$ vi 3-app-user.sql
 user@server:~/terasology-key-server/sql$ cat *.sql | PGHOST="localhost" PGPASSWORD="admin-pass" psql -U terasologykeys_admin -d terasologykeys
 ```
 (replace `admin-pass` with the password you entered when asked by `createuser`). You don't need to manually create the limited user since the last sql file automatically generates it and assigns the correct privileges.
+* Set up a cron job (for example via `crontab` running the `psql` database client) to periodically (for example once a day) run the stored procedure `cleanup_expired_tokens()`.
 
 # Web application
 * If you changed the password for the limited user, edit `webapp/config.json` accordingly. Alternatively, you can copy the configuration to another file, edit it, and then specify the config file when you launch the application with the `--config <file>` command line switch.
