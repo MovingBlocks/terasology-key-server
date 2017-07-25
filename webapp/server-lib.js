@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const statusCodes = require('builtin-status-codes');
 const expressPostgresModule = require('express-postgres-sp');
 const schemaLoader = require(path.join(__dirname, 'schemaLoader'));
+const cors = require('cors');
 
 const noToken = JSON.parse(fs.readFileSync(path.join(__dirname, 'no-token.json')));
 const apiPaths = ['/api/:resource', '/api/:resource/:argument'];
@@ -16,6 +17,11 @@ module.exports = (dbConfig) => {
   const schemaFiles = schemaLoader.list();
   const schemaList = schemaLoader.names(schemaFiles);
   schemaLoader.load(schemaFiles, ajv);
+
+  //Allow Cross-Origin requests (API calls from browsers on any domain)
+  app.use(cors());
+  //Enable CORS preflight
+  app.options('*', cors());
 
   //Request header validation
   app.all(apiPaths, (req, res, next) => {

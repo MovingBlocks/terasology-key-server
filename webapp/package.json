@@ -20,6 +20,7 @@
     "ajv": "^5.1.0",
     "body-parser": "^1.17.1",
     "builtin-status-codes": "^3.0.0",
+    "cors": "^2.8.4",
     "express": "^4.15.2",
     "express-postgres-sp": "^0.1.1",
     "recursive-readdir-sync": "^1.0.6"
