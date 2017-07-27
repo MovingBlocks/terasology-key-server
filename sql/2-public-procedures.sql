@@ -121,13 +121,19 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE FUNCTION get_client_identity(body JSON, urlArgument TEXT, sessionToken UUID) RETURNS JSON AS $$
   DECLARE
     userID INT;
+    result JSON;
   BEGIN
     userID := auth(sessionToken);
-    RETURN json_build_object('clientIdentity', json_identity(CL_ID, CL_CRT, SRV_CRT))
+    SELECT json_build_object('clientIdentity', json_identity(CL_ID, CL_CRT, SRV_CRT)) INTO result
       FROM client_identity CL_ID
         JOIN public_cert CL_CRT ON CL_ID.public_cert_id = CL_CRT.internal_id
         JOIN public_cert SRV_CRT ON CL_ID.server_public_cert_id = SRV_CRT.internal_id
       WHERE CL_ID.user_account_id = userID AND SRV_CRT.id = urlArgument::UUID;
+    IF NOT FOUND THEN
+      PERFORM raiseCustomException(404, 'No identity exists for the specified server in this account.');
+    ELSE
+      RETURN result;
+    END IF;
   END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
