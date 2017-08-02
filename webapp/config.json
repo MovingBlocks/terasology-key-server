@@ -1,5 +1,14 @@
 {
-  "listenPort": 8000,
+  "http": {
+    "mode": "redirectToHttpsConfiguredPort",
+    "port": 8000
+  },
+  "https": {
+    "enabled": true,
+    "port": 8443,
+    "keyFile": "https/private.key",
+    "certFile": "https/certificate.pem"
+  },
   "db": {
     "user": "terasologykeys_app",
     "database": "terasologykeys",

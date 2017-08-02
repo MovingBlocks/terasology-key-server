@@ -12,11 +12,25 @@ const cors = require('cors');
 const noToken = JSON.parse(fs.readFileSync(path.join(__dirname, 'no-token.json')));
 const apiPaths = ['/api/:resource', '/api/:resource/:argument'];
 
-module.exports = (dbConfig) => {
+module.exports = (dbConfig, redirectHttpToHttps, httpsPort) => {
   const expressPostgres = expressPostgresModule(dbConfig);
   const schemaFiles = schemaLoader.list();
   const schemaList = schemaLoader.names(schemaFiles);
   schemaLoader.load(schemaFiles, ajv);
+
+  if (redirectHttpToHttps) {
+    app.use((req, res, next) => {
+      if(!req.secure) {
+        let host = req.get('Host');
+        host = host.substring(0, host.indexOf(':')); // remove HTTP port number
+        if (httpsPort !== undefined) { // if not using default port, append port number
+           host += ':' + httpsPort;
+        }
+        return res.redirect(['https://', host, req.url].join(''));
+      }
+      next();
+    });
+  }
 
   //Allow Cross-Origin requests (API calls from browsers on any domain)
   app.use(cors());
