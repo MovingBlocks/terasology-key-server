@@ -11,5 +11,4 @@ RUN npm install
 COPY . .
 RUN chmod +x docker-setup.sh
 
-EXPOSE 8000
 CMD ./docker-setup.sh

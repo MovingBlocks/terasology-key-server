@@ -5,7 +5,7 @@ const request = require('supertest');
 const tap = require('tap');
 
 const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json')));
-const app = require(path.join(__dirname, 'server-lib'))(config.db);
+const app = require(path.join(__dirname, 'server-lib'))(config.db, config.staticFiles.rootDir);
 const schemaLoader = require(path.join(__dirname, 'schemaLoader'));
 
 const schemaFiles = schemaLoader.list();
