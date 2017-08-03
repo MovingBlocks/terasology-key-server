@@ -1,11 +1,10 @@
 -- database structure
 
-DROP SCHEMA IF EXISTS terasologykeys CASCADE;
-CREATE SCHEMA terasologykeys;
+CREATE SCHEMA IF NOT EXISTS terasologykeys;
 
 SET search_path TO 'terasologykeys';
 
-CREATE TABLE user_account(
+CREATE TABLE IF NOT EXISTS user_account(
   id SERIAL PRIMARY KEY,
   login VARCHAR(40) NOT NULL UNIQUE,
   password TEXT NOT NULL,
@@ -17,13 +16,13 @@ CREATE TABLE user_account(
   CHECK(email IS NULL OR email ~ '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$')
 );
 
-CREATE TABLE session (
+CREATE TABLE IF NOT EXISTS session (
   token UUID PRIMARY KEY DEFAULT public.uuid_generate_v4(),
   user_account_id INT NOT NULL REFERENCES user_account(id) ON UPDATE CASCADE ON DELETE NO ACTION,
   login_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE public_cert (
+CREATE TABLE IF NOT EXISTS public_cert (
   internal_id SERIAL PRIMARY KEY,
   id UUID UNIQUE,
   modulus BYTEA NOT NULL,
@@ -31,7 +30,7 @@ CREATE TABLE public_cert (
   signature BYTEA NOT NULL
 );
 
-CREATE TABLE client_identity (
+CREATE TABLE IF NOT EXISTS client_identity (
   user_account_id INT NOT NULL REFERENCES user_account(id),
   public_cert_id INT PRIMARY KEY REFERENCES public_cert(internal_id) ON UPDATE CASCADE ON DELETE NO ACTION,
   server_public_cert_id INT NOT NULL REFERENCES public_cert(internal_id) ON UPDATE CASCADE ON DELETE NO ACTION,
@@ -39,3 +38,5 @@ CREATE TABLE client_identity (
   private_cert_exponent BYTEA NOT NULL,
   UNIQUE(user_account_id, server_public_cert_id)
 );
+
+SELECT pg_temp.drop_all_functions_in_schema('terasologykeys');

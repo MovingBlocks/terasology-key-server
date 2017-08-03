@@ -22,8 +22,10 @@ before_script:
   - psql -U postgres -d terasologykeys -c "CREATE EXTENSION http;"
   - psql -U postgres -d terasologykeys -c "CREATE EXTENSION pgtap;"
 script:
+  # install database default configuration
+  - cat sql/default-config.sql | psql -d terasologykeys
   # install database (test SQL syntax)
-  - cat sql/*.sql | psql -d terasologykeys
+  - cat sql/main/*.sql | psql -d terasologykeys
   # unit test stored procedures
   - pg_prove -U postgres -d terasologykeys sql/test/*.sql
   # validate JSON schemas

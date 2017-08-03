@@ -96,11 +96,9 @@ CREATE FUNCTION checkRecaptcha(answer TEXT) RETURNS VOID AS $$
      --for the unit and integration tests
       answer = '03AOPBWq_WzyjPeyh1aNzhFpH2dEapEuN00Jy0PqJGipjrvW2RFD6cWBCfx7GOmKkQd-heVB3VVYusZtJbF1glB3Q-nzs1h95SuU8GT5Fqq_cL9y9U2NEq53h1wXBDNtYDikJ6xjuzicAkgqfSBTON-ec5BH5nfVxWiUqhl6irQB9bmMe3dH48L7Pnx1vqb5-PL_dKEB-ICzf-8v2kIiBIJlwUVurAkClqrup8wLDVBBV_FGu0mO-D0k1Gx39NH5zGAyANqbAg1wjaZeDZQ5t-tKBJzCZW0AK-x7SilcUcQBSzJwb6p40XGJY';
     END IF;
-    --NOTE 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe is a test key! Please replace it before using in production.
-    --Info about the test keys here: https://developers.google.com/recaptcha/docs/faq#id-like-to-run-automated-tests-with-recaptcha-v2-what-should-i-do
     SELECT content::JSON INTO response FROM public.http_post(
       'https://www.google.com/recaptcha/api/siteverify',
-      'secret=6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe&response=' || answer,
+      'secret=' || get_reCAPTCHA_secret() || '&response=' || answer,
       'application/x-www-form-urlencoded');
     IF NOT (response->>'success')::BOOLEAN THEN
       RAISE NOTICE 'reCAPTCHA validation failure: %', (response->>'error-codes')::TEXT;
