@@ -14,13 +14,13 @@ let app;
 
 switch (config.http.mode) {
   case "preserveHttp":
-    app = createApp(config.db, false);
+    app = createApp(config.db, config.staticFiles.rootDir, false);
     break;
   case "redirectToHttpsConfiguredPort":
-    app = createApp(config.db, true, config.https.port);
+    app = createApp(config.db, config.staticFiles.rootDir, true, config.https.port);
     break;
   case "redirectToHttpsDefaultPort":
-    app = createApp(config.db, true);
+    app = createApp(config.db, config.staticFiles.rootDir, true);
     break;
   default:
     console.warn('Invalid HTTP mode in configuration - valid values are "enabled", "disabled", "redirectToHTTPS"');

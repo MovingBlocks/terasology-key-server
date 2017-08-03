@@ -12,7 +12,7 @@ const cors = require('cors');
 const noToken = JSON.parse(fs.readFileSync(path.join(__dirname, 'no-token.json')));
 const apiPaths = ['/api/:resource', '/api/:resource/:argument'];
 
-module.exports = (dbConfig, redirectHttpToHttps, httpsPort) => {
+module.exports = (dbConfig, staticRoot, redirectHttpToHttps, httpsPort) => {
   const expressPostgres = expressPostgresModule(dbConfig);
   const schemaFiles = schemaLoader.list();
   const schemaList = schemaLoader.names(schemaFiles);
@@ -104,7 +104,7 @@ module.exports = (dbConfig, redirectHttpToHttps, httpsPort) => {
   });
 
   //serve the frontend
-  app.use('/static', express.static(path.join(__dirname, 'static')));
+  app.use('/static', express.static(staticRoot));
   app.get('/', (req, res) => res.redirect('/static/register.html'));
 
   return app;
