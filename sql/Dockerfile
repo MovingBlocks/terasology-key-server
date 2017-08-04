@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y postgresql-plpython-9.6
 # install HTTP extension
 WORKDIR /usr/src/pgsql-http
 RUN apt-get update && \
-	apt-get install -y git build-essential postgresql-server-dev-9.6 postgresql-contrib libcurl4-openssl-dev && \
+	apt-get install -y sudo git build-essential postgresql-server-dev-9.6 postgresql-contrib libcurl4-openssl-dev && \
 	git clone https://github.com/pramsey/pgsql-http.git . && make install
 
 # install mail extension (pgsmtp)
@@ -15,6 +15,13 @@ RUN git clone https://github.com/asotolongo/pgsmtp.git . && make install
 
 # remove unnecessary packages
 RUN apt-get remove -y git build-essential && apt-get autoremove -y && apt-get clean
+
+# set up cron for cleanup of expired sessions and registrations
+RUN useradd -r terasologykeys_batch -s /bin/bash && \
+	echo '0 * * * * terasologykeys_batch psql -d terasologykeys -c "SELECT cleanup_expired_tokens(); " > /dev/null 2>&1' >> /etc/crontab
+
+# allow docker-setup.sh to use sudo to start cron daemon
+RUN echo "postgres ALL=(root) NOPASSWD: /usr/sbin/cron" >> /etc/sudoers
 
 # copy SQL files and installer script
 WORKDIR /usr/src/app-sql

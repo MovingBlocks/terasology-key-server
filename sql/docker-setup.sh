@@ -52,9 +52,12 @@ fi
 cat > /var/lib/postgresql/data/pg_hba.conf <<EOL
 local * * reject
 host * * * reject
-local terasologykeys terasologykeys_batch trust
+local terasologykeys terasologykeys_batch peer
 host terasologykeys $APP_USER_NAME $APP_IP/32 md5
 EOL
 
 # apply changes
 pg_ctl reload
+
+# start crontab to run the automatic cleanup added in the Dockerfile
+sudo /usr/sbin/cron
