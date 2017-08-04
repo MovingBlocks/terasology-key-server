@@ -106,3 +106,17 @@ CREATE FUNCTION checkRecaptcha(answer TEXT) RETURNS VOID AS $$
     END IF;
   END;
 $$ LANGUAGE plpgsql;
+
+CREATE FUNCTION sendmail(address TEXT, subject TEXT, message TEXT) RETURNS VOID AS $$
+  DECLARE
+    sender TEXT;
+    result TEXT;
+  BEGIN
+    -- user/sender is retrieved from the smtp extension settings table
+    sender := smtp_user FROM pgsmtp.user_smtp_data;
+    result := pgsmtp.pg_smtp_mail(sender, address, '{}', subject, message);
+    IF result <> 'Send' THEN
+      PERFORM raiseCustomException(500, 'Failed to send mail: ' || result);
+    END IF;
+  END;
+$$ LANGUAGE plpgsql;

@@ -15,14 +15,11 @@ CREATE FUNCTION post_user_account(body JSON) RETURNS VOID AS $$
     END IF;
     INSERT INTO user_account (login, password, email, confirmToken) VALUES (body->>'login', crypt(body->>'password1', gen_salt('bf', 8)), email, confTok);
     IF email IS NOT NULL THEN -- TODO: retrieve sender address from pgsmtp.user_smtp_data
-      mailerResult := pgsmtp.pg_smtp_mail('Terasology Identity Storage Service <noreply@localhost>', 'User <'||(body->>'email')||'>', NULL, 'Confirm account registration',
+      PERFORM sendmail((body->>'login')||' <'||(body->>'email')||'>', 'Confirm account registration',
         'Thank you for registering on this Terasology identity storage server!' || E'\n\n' ||
         'The code to verify your account is: ' || confTok || E'\n\n' ||
         'Paste this in the web page you used for registration to activate your account.' || E'\n' ||
         'NOTE: if an account is not verified in 2 hours after the registration form submission, it is deleted.');
-      IF mailerResult <> 'Send' THEN
-        PERFORM raiseCustomException(500, 'Failed to send mail: ' || mailerResult);
-      END IF;
     END IF;
   EXCEPTION
       WHEN unique_violation THEN PERFORM raiseCustomException(409, 'The specified username is not available.');
@@ -53,7 +50,7 @@ CREATE FUNCTION post_user_account(body JSON, urlArgument TEXT) RETURNS VOID AS $
     IF NOT FOUND THEN
       PERFORM raiseCustomException(403, 'The specified account does not exists, has not been activated or already requested a password reset.');
     END IF;
-    PERFORM public.pgmail('Terasology Identity Storage Service <noreply@localhost>', 'User <'||(body->>'email')||'>', 'Reset your password',
+    PERFORM sendmail((body->>'login')||' <'||(body->>'email')||'>', 'Reset your password',
       'You requested to reset your account''s password on this Terasology identity storage server.' || E'\n\n' ||
       'The code to reset your password is: ' || token || E'\n\n' ||
       'Paste this in the web page you used to request the password reset to actually change your password.' || E'\n' ||

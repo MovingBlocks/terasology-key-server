@@ -12,15 +12,20 @@ services:
     - DB_NAME=terasologykeys
     - DB_USER=terasologykeys_app
     - DB_PASSWORD=${DB_PASSWORD}
-    # - RECAPTCHA_SITE_KEY=
+    - RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY}
   database:
     build: ./sql
     environment:
     - APP_USER_NAME=terasologykeys_app
     - APP_USER_PASSWORD=${DB_PASSWORD}
     - APP_HOSTNAME=webapp
-    - SMTP_SERVER=localhost
+    - SMTP_SERVER=mailer
     - SMTP_PORT=25
     - SMTP_USER=noreply@localhost
-    - SMTP_PASSWORD=${MAIL_PASSWORD}
-    # - RECAPTCHA_SECRET_KEY=
+    - SMTP_PASS=${MAIL_PASSWORD}
+    - RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY}
+  mailer:
+    image: "catatnight/postfix:latest"
+    environment:
+    - smtp_user=noreply@localhost:${MAIL_PASSWORD}
+    - maildomain=localhost

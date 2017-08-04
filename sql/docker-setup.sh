@@ -12,8 +12,7 @@ psql --username "$POSTGRES_USER" -d terasologykeys -c "CREATE LANGUAGE plpythonu
 
 # setup SMTP server
 if [[ -z $SMTP_PORT ]]; then SMTP_PORT=25; fi
-psql --username "$POSTGRES_USER" -d terasologykeys -c "INSERT INTO pgsmtp.user_smtp_data VALUES ('$SMTP_USER', '$SMTP_SERVER', $SMTP_PORT, '$SMTP_PASS');"
-psql --username "$POSTGRES_USER" -d terasologykeys -c "GRANT USAGE ON SCHEMA pgsmtp TO terasologykeys_admin; GRANT SELECT ON pgsmtp.user_smtp_data TO terasologykeys_admin; "
+psql --username "$POSTGRES_USER" -d terasologykeys -c "INSERT INTO pgsmtp.user_smtp_data VALUES ('$SMTP_USER', '$SMTP_SERVER', $SMTP_PORT, '$SMTP_PASS'); GRANT USAGE ON SCHEMA pgsmtp TO terasologykeys_admin; GRANT SELECT ON pgsmtp.user_smtp_data TO terasologykeys_admin; "
 
 # override configuration according to env variables
 CFGDEFAULTFILE=/etc/app-sql/default-config.sql
