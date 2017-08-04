@@ -10,11 +10,11 @@ CREATE FUNCTION post_user_account(body JSON) RETURNS VOID AS $$
     PERFORM checkRecaptcha(body->>'recaptchaAnswer');
     IF (body->>'email') IS NOT NULL AND (body->>'email') <> '' THEN
       email = body->>'email';
-      confTok := public.uuid_generate_v4();
+      confTok := public.gen_random_uuid();
     END IF;
     INSERT INTO user_account (login, password, email, confirmToken) VALUES (body->>'login', crypt(body->>'password1', gen_salt('bf', 8)), email, confTok);
-    IF email IS NOT NULL THEN
-      PERFORM public.pgmail('Terasology Identity Storage Service <noreply@localhost>', 'User <'||(body->>'email')||'>', 'Confirm account registration',
+    IF email IS NOT NULL THEN -- TODO: retrieve sender address from pgsmtp.user_smtp_data
+      PERFORM pgsmtp.pg_smtp_mail('Terasology Identity Storage Service <noreply@localhost>', 'User <'||(body->>'email')||'>', NULL, 'Confirm account registration',
         'Thank you for registering on this Terasology identity storage server!' || E'\n\n' ||
         'The code to verify your account is: ' || confTok || E'\n\n' ||
         'Paste this in the web page you used for registration to activate your account.' || E'\n' ||
@@ -43,7 +43,7 @@ CREATE FUNCTION post_user_account(body JSON, urlArgument TEXT) RETURNS VOID AS $
     token UUID;
   BEGIN
     PERFORM assertUrl(urlArgument, 'passwordReset');
-    token := public.uuid_generate_v4();
+    token := public.gen_random_uuid();
     UPDATE user_account SET confirmToken = token, confirmTokenTimestamp = CURRENT_TIMESTAMP, requestedPasswordReset = TRUE
       WHERE email = (body->>'email') AND login = (body->>'login') AND confirmToken IS NULL AND NOT requestedPasswordReset;
     IF NOT FOUND THEN

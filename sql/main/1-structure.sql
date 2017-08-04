@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS user_account(
 );
 
 CREATE TABLE IF NOT EXISTS session (
-  token UUID PRIMARY KEY DEFAULT public.uuid_generate_v4(),
+  token UUID PRIMARY KEY DEFAULT public.gen_random_uuid(),
   user_account_id INT NOT NULL REFERENCES user_account(id) ON UPDATE CASCADE ON DELETE NO ACTION,
   login_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
