@@ -5,6 +5,7 @@ CREATE FUNCTION post_user_account(body JSON) RETURNS VOID AS $$
   DECLARE
     confTok UUID;
     email TEXT;
+    mailerResult TEXT;
   BEGIN
     PERFORM validatePassword(body->>'password1', body->>'password2');
     PERFORM checkRecaptcha(body->>'recaptchaAnswer');
@@ -14,11 +15,14 @@ CREATE FUNCTION post_user_account(body JSON) RETURNS VOID AS $$
     END IF;
     INSERT INTO user_account (login, password, email, confirmToken) VALUES (body->>'login', crypt(body->>'password1', gen_salt('bf', 8)), email, confTok);
     IF email IS NOT NULL THEN -- TODO: retrieve sender address from pgsmtp.user_smtp_data
-      PERFORM pgsmtp.pg_smtp_mail('Terasology Identity Storage Service <noreply@localhost>', 'User <'||(body->>'email')||'>', NULL, 'Confirm account registration',
+      mailerResult := pgsmtp.pg_smtp_mail('Terasology Identity Storage Service <noreply@localhost>', 'User <'||(body->>'email')||'>', NULL, 'Confirm account registration',
         'Thank you for registering on this Terasology identity storage server!' || E'\n\n' ||
         'The code to verify your account is: ' || confTok || E'\n\n' ||
         'Paste this in the web page you used for registration to activate your account.' || E'\n' ||
         'NOTE: if an account is not verified in 2 hours after the registration form submission, it is deleted.');
+      IF mailerResult <> 'Send' THEN
+        PERFORM raiseCustomException(500, 'Failed to send mail: ' || mailerResult);
+      END IF;
     END IF;
   EXCEPTION
       WHEN unique_violation THEN PERFORM raiseCustomException(409, 'The specified username is not available.');
