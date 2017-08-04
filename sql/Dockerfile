@@ -1,8 +1,5 @@
 FROM postgres:9.6
 
-# avoid showing docker image default warning, password authentication for root user will be disabled later # TODO do it!
-ENV POSTGRES_PASSWORD=no_password_auth
-
 # for mail sender stored procedure
 RUN apt-get update && apt-get install -y postgresql-plpython-9.6
 

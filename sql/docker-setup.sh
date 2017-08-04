@@ -25,8 +25,10 @@ function addConfigEntry {
 	\$\$ LANGUAGE sql;" >> $CFGOVERRIDEFILE;
 }
 if [[ -n $RECAPTCHA_SECRET_KEY ]]; then addConfigEntry reCAPTCHA_secret $RECAPTCHA_SECRET_KEY ; fi
-if [[ -n $APP_USER_NAME ]]; then addConfigEntry app_user_name $APP_USER_NAME ; fi
+if [[ -n $APP_USER_NAME ]]; then addConfigEntry app_user_name $APP_USER_NAME ; fi # No longer configurable because it's stored in firewall (pg_hba.conf)
 if [[ -n $APP_USER_PASSWORD ]]; then addConfigEntry app_user_password $APP_USER_PASSWORD ; fi
+addConfigEntry batch_user_name terasologykeys_batch;
+addConfigEntry batch_user_password "test"; # TODO: set empty
 
 # uncomment for debug (warning: could show sensitive information like reCAPTCHA secret key and database roles access credentials)
 # echo "BEGIN CONFIG OVERRIDE FILE"
@@ -38,3 +40,15 @@ cat $CFGDEFAULTFILE $CFGOVERRIDEFILE /usr/src/app-sql/*.sql | psql --username te
 
 # remove temporary files
 rm $CFGOVERRIDEFILE
+
+# set up firewall
+if [[ -z $APP_USER_NAME ]]; then APP_USER_NAME=terasologykeys_app; fi
+if [[ -z $APP_HOSTNAME ]]; then APP_HOSTNAME=localhost; echo "WARNING: APP_HOSTNAME is not set! Application won't be able to connect."; fi
+cat > /var/lib/postgresql/data/pg_hba.conf <<EOL
+local * * reject
+host * * * reject
+local terasologykeys terasologykeys_batch trust
+host terasologykeys $APP_USER_NAME $APP_HOSTNAME md5
+EOL
+# apply changes
+pg_ctl reload
