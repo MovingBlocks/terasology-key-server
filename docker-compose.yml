@@ -5,11 +5,15 @@ services:
     ports:
     - ${HTTP_PORT}:${HTTP_PORT}
     - ${HTTPS_PORT}:${HTTPS_PORT}
+    volumes:
+    - ${HTTPS_CERT_VOLUME}:/etc/app/certificates
     environment:
     - HTTP_MODE=${HTTP_MODE}
     - HTTP_PORT=${HTTP_PORT}
     - HTTPS_ENABLED=${HTTPS_ENABLED}
     - HTTPS_PORT=${HTTPS_PORT}
+    - HTTPS_KEYFILE=${HTTPS_KEYFILE}
+    - HTTPS_CERTFILE=${HTTPS_CERTFILE}
     - DB_HOST=database
     - DB_PORT=5432
     - DB_NAME=terasologykeys

@@ -21,8 +21,8 @@ if [[ -n $HTTP_PORT ]]; then json -f $CFGPATH -Ie 'this.http.port='$HTTP_PORT; f
 
 if [[ -n $HTTPS_PORT ]]; then json -f $CFGPATH -Ie 'this.https.port='$HTTPS_PORT; fi
 if [[ -n $HTTPS_ENABLED ]]; then json -f $CFGPATH -Ie 'this.https.enabled='$HTTPS_ENABLED; fi
-if [[ -n $HTTPS_KEYFILE ]]; then json -f $CFGPATH -Ie 'this.https.keyFile="'$HTTPS_KEYFILE'"'; fi
-if [[ -n $HTTPS_CERTFILE ]]; then json -f $CFGPATH -Ie 'this.https.keyFile="'$HTTPS_CERTFILE'"'; fi
+if [[ -n $HTTPS_KEYFILE ]]; then json -f $CFGPATH -Ie 'this.https.keyFile="'/etc/app/certificates/$HTTPS_KEYFILE'"'; fi
+if [[ -n $HTTPS_CERTFILE ]]; then json -f $CFGPATH -Ie 'this.https.keyFile="'/etc/app/certificates/$HTTPS_CERTFILE'"'; fi
 
 if [[ -n $DB_HOST ]]; then json -f $CFGPATH -Ie 'this.db.host="'$DB_HOST'"'; fi
 if [[ -n $DB_PORT ]]; then json -f $CFGPATH -Ie 'this.db.port="'$DB_PORT'"'; fi
