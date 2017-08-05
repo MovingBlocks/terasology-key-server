@@ -1,6 +1,7 @@
 --NOTE 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe is a test key! Please replace the function before using in production.
 --Info about the test keys here: https://developers.google.com/recaptcha/docs/faq#id-like-to-run-automated-tests-with-recaptcha-v2-what-should-i-do
-CREATE OR REPLACE FUNCTION get_reCAPTCHA_secret() RETURNS TEXT AS $$
+CREATE SCHEMA config;
+CREATE OR REPLACE FUNCTION config.get_reCAPTCHA_secret() RETURNS TEXT AS $$
   SELECT '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'::TEXT;
 $$ LANGUAGE sql;
 

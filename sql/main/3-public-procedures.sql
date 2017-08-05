@@ -5,7 +5,6 @@ CREATE FUNCTION post_user_account(body JSON) RETURNS VOID AS $$
   DECLARE
     confTok UUID;
     email TEXT;
-    mailerResult TEXT;
   BEGIN
     PERFORM validatePassword(body->>'password1', body->>'password2');
     PERFORM checkRecaptcha(body->>'recaptchaAnswer');
@@ -14,7 +13,7 @@ CREATE FUNCTION post_user_account(body JSON) RETURNS VOID AS $$
       confTok := public.gen_random_uuid();
     END IF;
     INSERT INTO user_account (login, password, email, confirmToken) VALUES (body->>'login', crypt(body->>'password1', gen_salt('bf', 8)), email, confTok);
-    IF email IS NOT NULL THEN -- TODO: retrieve sender address from pgsmtp.user_smtp_data
+    IF email IS NOT NULL THEN
       PERFORM sendmail((body->>'login')||' <'||(body->>'email')||'>', 'Confirm account registration',
         'Thank you for registering on this Terasology identity storage server!' || E'\n\n' ||
         'The code to verify your account is: ' || confTok || E'\n\n' ||

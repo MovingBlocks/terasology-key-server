@@ -17,9 +17,10 @@ if [[ -n $RECAPTCHA_SITE_KEY ]]; then
 fi
 
 if [[ -n $HTTP_MODE ]]; then json -f $CFGPATH -Ie 'this.http.mode="'$HTTP_MODE'"'; fi
-if [[ -n $HTTP_PORT ]]; then json -f $CFGPATH -Ie 'this.http.port="'$HTTP_PORT'"'; fi
+if [[ -n $HTTP_PORT ]]; then json -f $CFGPATH -Ie 'this.http.port='$HTTP_PORT; fi
 
-if [[ -n $HTTPS_PORT ]]; then json -f $CFGPATH -Ie 'this.https.port="'$HTTPS_PORT'"'; fi
+if [[ -n $HTTPS_PORT ]]; then json -f $CFGPATH -Ie 'this.https.port='$HTTPS_PORT; fi
+if [[ -n $HTTPS_ENABLED ]]; then json -f $CFGPATH -Ie 'this.https.enabled='$HTTPS_ENABLED; fi
 if [[ -n $HTTPS_KEYFILE ]]; then json -f $CFGPATH -Ie 'this.https.keyFile="'$HTTPS_KEYFILE'"'; fi
 if [[ -n $HTTPS_CERTFILE ]]; then json -f $CFGPATH -Ie 'this.https.keyFile="'$HTTPS_CERTFILE'"'; fi
 

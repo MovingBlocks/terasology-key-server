@@ -92,14 +92,17 @@ CREATE FUNCTION checkRecaptcha(answer TEXT) RETURNS VOID AS $$
   DECLARE
     response JSON;
   BEGIN
+    RAISE NOTICE 'Checking reCAPTCHA...';
     IF answer IS NULL THEN
+     RAISE NOTICE 'Using default answer for tests';
      --for the unit and integration tests
       answer = '03AOPBWq_WzyjPeyh1aNzhFpH2dEapEuN00Jy0PqJGipjrvW2RFD6cWBCfx7GOmKkQd-heVB3VVYusZtJbF1glB3Q-nzs1h95SuU8GT5Fqq_cL9y9U2NEq53h1wXBDNtYDikJ6xjuzicAkgqfSBTON-ec5BH5nfVxWiUqhl6irQB9bmMe3dH48L7Pnx1vqb5-PL_dKEB-ICzf-8v2kIiBIJlwUVurAkClqrup8wLDVBBV_FGu0mO-D0k1Gx39NH5zGAyANqbAg1wjaZeDZQ5t-tKBJzCZW0AK-x7SilcUcQBSzJwb6p40XGJY';
     END IF;
     SELECT content::JSON INTO response FROM public.http_post(
       'https://www.google.com/recaptcha/api/siteverify',
-      'secret=' || get_reCAPTCHA_secret() || '&response=' || answer,
+      'secret=' || config.get_reCAPTCHA_secret() || '&response=' || answer,
       'application/x-www-form-urlencoded');
+    RAISE NOTICE 'reCAPTCHA result: %', response;
     IF NOT (response->>'success')::BOOLEAN THEN
       RAISE NOTICE 'reCAPTCHA validation failure: %', (response->>'error-codes')::TEXT;
       PERFORM raiseCustomException(403, 'reCAPTCHA validation failed.');
