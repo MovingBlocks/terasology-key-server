@@ -22,7 +22,9 @@ module.exports = (dbConfig, staticRoot, redirectHttpToHttps, httpsPort) => {
     app.use((req, res, next) => {
       if(!req.secure) {
         let host = req.get('Host');
-        host = host.substring(0, host.indexOf(':')); // remove HTTP port number
+        if (host.indexOf(':') > -1) {
+          host = host.substring(0, host.indexOf(':')); // remove HTTP port number
+        }
         if (httpsPort !== undefined) { // if not using default port, append port number
            host += ':' + httpsPort;
         }
