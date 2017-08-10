@@ -29,6 +29,8 @@ if [[ -n $APP_USER_NAME ]]; then addConfigEntry pg_temp.get_app_user_name $APP_U
 if [[ -n $APP_USER_PASSWORD ]]; then addConfigEntry pg_temp.get_app_user_password $APP_USER_PASSWORD ; fi
 addConfigEntry pg_temp.get_batch_user_name terasologykeys_batch
 addConfigEntry pg_temp.get_batch_user_password ""
+addConfigEntry pg_temp.get_backup_user_name terasologykeys_backup
+addConfigEntry pg_temp.get_backup_user_password ""
 
 # uncomment for debug (warning: could show sensitive information like reCAPTCHA secret key and database roles access credentials)
 # echo "BEGIN CONFIG OVERRIDE FILE"
@@ -53,6 +55,7 @@ cat > /var/lib/postgresql/data/pg_hba.conf <<EOL
 local * * reject
 host * * * reject
 local terasologykeys terasologykeys_batch peer
+local terasologykeys terasologykeys_backup peer
 host terasologykeys $APP_USER_NAME $APP_IP/32 md5
 EOL
 
@@ -62,5 +65,8 @@ EOL
 # apply changes
 pg_ctl reload
 
-# start crontab to run the automatic cleanup added in the Dockerfile
+# fix permissions for backups volume
+sudo /bin/chown terasologykeys_backup:terasologykeys_backup /var/terasologykeys_backups
+
+# start crontab to run the automatic cleanup and backups added in the Dockerfile
 sudo /usr/sbin/cron

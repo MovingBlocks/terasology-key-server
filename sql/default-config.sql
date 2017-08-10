@@ -20,3 +20,11 @@ $$ LANGUAGE sql;
 CREATE FUNCTION pg_temp.get_batch_user_password() RETURNS TEXT AS $$
   SELECT 'ffafd66fd860bd7ad9d86c7e861799994b04aba4720233c4b8b55e630e777e1a'::TEXT;
 $$ LANGUAGE sql;
+
+CREATE FUNCTION pg_temp.get_backup_user_name() RETURNS TEXT AS $$
+  SELECT 'terasologykeys_backup'::TEXT;
+$$ LANGUAGE sql;
+
+CREATE FUNCTION pg_temp.get_backup_user_password() RETURNS TEXT AS $$
+  SELECT 'c20808829becd3f30e7ea4a11c31e6fef60cd678f3f33742796329176b22df70'::TEXT;
+$$ LANGUAGE sql;

@@ -18,10 +18,14 @@ RUN apt-get remove -y git build-essential && apt-get autoremove -y && apt-get cl
 
 # set up cron for cleanup of expired sessions and registrations
 RUN useradd -r terasologykeys_batch -s /bin/bash && \
-	echo '0 * * * * terasologykeys_batch psql -d terasologykeys -c "SELECT cleanup_expired_tokens(); " > /dev/null 2>&1' >> /etc/crontab
+	useradd -r terasologykeys_backup -s /bin/bash && \
+	# mkdir /var/terasologykeys_backups && \
+	# chown terasologykeys_backup:terasologykeys_backup /var/terasologykeys_backups && \
+	echo '0 * * * * terasologykeys_batch psql -d terasologykeys -c "SELECT cleanup_expired_tokens(); " > /dev/null 2>&1' >> /etc/crontab && \
+	echo '0 0 * * * terasologykeys_backup pg_dump -n terasologykeys -a terasologykeys > /var/terasologykeys_backups/backup_$(date -Iseconds) 2>/var/terasologykeys_backups/error_$(date -Iseconds)' >> /etc/crontab
 
 # allow docker-setup.sh to use sudo to start cron daemon
-RUN echo "postgres ALL=(root) NOPASSWD: /usr/sbin/cron" >> /etc/sudoers
+RUN echo "postgres ALL=(root) NOPASSWD: /usr/sbin/cron, /bin/chown" >> /etc/sudoers
 
 # copy SQL files and installer script
 WORKDIR /usr/src/app-sql

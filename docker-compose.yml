@@ -22,6 +22,8 @@ services:
     - RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY}
   database:
     build: ./sql
+    volumes:
+    - ${DB_BACKUP_VOLUME}:/var/terasologykeys_backups
     environment:
     - APP_USER_NAME=terasologykeys_app
     - APP_USER_PASSWORD=${DB_PASSWORD}

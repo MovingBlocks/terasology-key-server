@@ -37,6 +37,11 @@ DO $$
     PERFORM pg_temp.create_restricted_user(pg_temp.get_batch_user_name(), pg_temp.get_batch_user_password());
     EXECUTE 'GRANT EXECUTE ON FUNCTION cleanup_expired_tokens() TO ' || pg_temp.get_batch_user_name();
 
+    -- generate the backup user (read-only access to all tables)
+    PERFORM pg_temp.create_restricted_user(pg_temp.get_backup_user_name(), pg_temp.get_backup_user_password());
+    EXECUTE 'GRANT SELECT ON ALL TABLES IN SCHEMA terasologykeys TO ' || pg_temp.get_backup_user_name(); 
+    EXECUTE 'GRANT SELECT ON ALL SEQUENCES IN SCHEMA terasologykeys TO ' || pg_temp.get_backup_user_name(); 
+
     RAISE NOTICE 'Finished installing schema and functions.';
   END;
 $$;
