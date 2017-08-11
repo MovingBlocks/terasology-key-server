@@ -23,7 +23,7 @@ RUN useradd -r terasologykeys_batch -s /bin/bash && \
 	echo '0 0 * * * terasologykeys_backup bash /backup.sh' >> /etc/crontab
 
 # allow docker-setup.sh to use sudo to start cron daemon
-RUN echo "postgres ALL=(root) NOPASSWD: /usr/sbin/cron, /bin/chown" >> /etc/sudoers
+RUN echo "postgres ALL=(root) NOPASSWD: /bin/chown" >> /etc/sudoers
 
 # copy SQL files, installer script and backup script
 WORKDIR /usr/src/app-sql
@@ -34,3 +34,6 @@ WORKDIR /docker-entrypoint-initdb.d
 COPY ./docker-setup.sh ./docker-setup.sh
 WORKDIR /
 COPY ./backup.sh ./backup.sh
+
+# override entrypoint to start cron daemon and postgres server
+ENTRYPOINT ["bash", "-c", "cron && docker-entrypoint.sh postgres"]

@@ -72,6 +72,3 @@ pg_ctl reload
 
 # fix permissions for backups volume
 sudo /bin/chown terasologykeys_backup:terasologykeys_backup /var/terasologykeys_backups
-
-# start crontab to run the automatic cleanup and backups added in the Dockerfile
-sudo /usr/sbin/cron
