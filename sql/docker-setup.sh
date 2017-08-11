@@ -43,6 +43,11 @@ cat $CFGDEFAULTFILE $CFGOVERRIDEFILE /usr/src/app-sql/*.sql | psql --username te
 # remove temporary files
 rm $CFGOVERRIDEFILE
 
+# restore backup if required
+if [[ -n $RESTORE_BACKUP_FILENAME ]]; then
+	cat /var/terasologykeys_backups/$RESTORE_BACKUP_FILENAME | psql --username terasologykeys_admin -d terasologykeys
+fi
+
 # set up firewall
 if [[ -z $APP_USER_NAME ]]; then APP_USER_NAME=terasologykeys_app; fi
 if [[ -z $APP_HOSTNAME ]]; then
