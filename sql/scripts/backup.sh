@@ -1,4 +1,5 @@
 #! /bin/bash
+
 echo "Performing backup..."
 pg_dump -n terasologykeys -a terasologykeys > /var/terasologykeys_backups/backup_$(date -Iseconds).sql 2>/var/terasologykeys_backups/error_$(date -Iseconds)
 echo "Deleting empty error logs..."

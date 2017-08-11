@@ -20,20 +20,19 @@ RUN apt-get remove -y git build-essential && apt-get autoremove -y && apt-get cl
 RUN useradd -r terasologykeys_batch -s /bin/bash && \
 	useradd -r terasologykeys_backup -s /bin/bash && \
 	echo '0 * * * * terasologykeys_batch psql -d terasologykeys -c "SELECT cleanup_expired_tokens(); " > /dev/null 2>&1' >> /etc/crontab && \
-	echo '0 0 * * * terasologykeys_backup bash /backup.sh' >> /etc/crontab
+	echo '0 0 * * * terasologykeys_backup bash /app-scripts/backup.sh' >> /etc/crontab
 
-# allow docker-setup.sh to use sudo to start cron daemon
-RUN echo "postgres ALL=(root) NOPASSWD: /bin/chown" >> /etc/sudoers
-
-# copy SQL files, installer script and backup script
+# copy SQL files, init and installer script and backup script
 WORKDIR /usr/src/app-sql
 COPY ./main .
 WORKDIR /etc/app-sql
 COPY ./default-config.sql ./default-config.sql
 WORKDIR /docker-entrypoint-initdb.d
 COPY ./docker-setup.sh ./docker-setup.sh
-WORKDIR /
-COPY ./backup.sh ./backup.sh
+RUN chmod +x docker-setup.sh && mkdir /app-scripts
+WORKDIR /app-scripts
+COPY ./scripts ./
+RUN chmod +x *.sh 
 
-# override entrypoint to start cron daemon and postgres server
-ENTRYPOINT ["bash", "-c", "cron && docker-entrypoint.sh postgres"]
+# override entrypoint to perform various initialization steps (see docker-init.sh)
+ENTRYPOINT ["/app-scripts/docker-init.sh"]
