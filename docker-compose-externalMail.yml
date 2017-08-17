@@ -1,0 +1,36 @@
+version: '2'
+services:
+  webapp:
+    build: ./webapp
+    ports:
+    - ${HTTP_PORT}:${HTTP_PORT}
+    - ${HTTPS_PORT}:${HTTPS_PORT}
+    volumes:
+    - ${HTTPS_CERT_VOLUME}:/etc/app/certificates
+    environment:
+    - HTTP_MODE=${HTTP_MODE}
+    - HTTP_PORT=${HTTP_PORT}
+    - HTTPS_ENABLED=${HTTPS_ENABLED}
+    - HTTPS_PORT=${HTTPS_PORT}
+    - HTTPS_KEYFILE=${HTTPS_KEYFILE}
+    - HTTPS_CERTFILE=${HTTPS_CERTFILE}
+    - DB_HOST=database
+    - DB_PORT=5432
+    - DB_NAME=terasologykeys
+    - DB_USER=terasologykeys_app
+    - DB_PASSWORD=${DB_PASSWORD}
+    - RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY}
+  database:
+    build: ./sql
+    volumes:
+    - ${DB_BACKUP_VOLUME}:/var/terasologykeys_backups
+    environment:
+    - APP_USER_NAME=terasologykeys_app
+    - APP_USER_PASSWORD=${DB_PASSWORD}
+    - APP_HOSTNAME=webapp
+    - SMTP_SERVER=${EXT_SMTP_SERVER}
+    - SMTP_PORT=${EXT_SMTP_PORT}
+    - SMTP_USER=${EXT_SMTP_USER}
+    - SMTP_PASS=${EXT_SMTP_PASSWORD}
+    - RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY}
+    - RESTORE_BACKUP_FILENAME=${DB_RESTORE_BACKUP_FILENAME}
